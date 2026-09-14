@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark light">
+<title>BTC Grid Sandbox · Research Terminal</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Crect width='40' height='40' rx='6' fill='%23121b25'/%3E%3Ctext x='20' y='29' text-anchor='middle' font-size='28' fill='%2364d8c2'%3E₿%3C/text%3E%3C/svg%3E">
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+<style>
+:root{color-scheme:dark;--bg:#0c1117;--surface:#121b25;--surface2:#192533;--border:#2b3a49;--text:#e4edf5;--muted:#99adbf;--faint:#243545;--accent:#64d8c2;--teal:#38bdb0;--amber:#e9b452;--red:#ef7782;--green:#64c990;--shadow:#05090e66;font-size:16px}
+:root[data-theme=light]{color-scheme:light;--bg:#eaf0f5;--surface:#fff;--surface2:#f2f6fa;--border:#c5d0db;--text:#172b40;--muted:#52697c;--faint:#dbe5ed;--accent:#007e70;--teal:#008b82;--amber:#986100;--red:#bb3449;--green:#157342;--shadow:#15263814}
+*{box-sizing:border-box;scrollbar-width:thin;scrollbar-color:var(--border) transparent}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.6 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}button,a{touch-action:manipulation}a{color:var(--accent);text-underline-offset:3px}button{cursor:pointer;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:8px 13px;min-height:40px;transition:background .15s}button:hover{background:var(--faint)}button:disabled{opacity:.45;cursor:not-allowed}button:focus-visible,a:focus-visible,summary:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}input,select{width:100%;min-width:0;min-height:40px;padding:8px 10px;color:var(--text);background:var(--bg);border:1px solid var(--border);border-radius:4px}input:disabled{opacity:.45}input[type=checkbox],input[type=radio]{width:16px;min-height:16px;accent-color:var(--accent);margin:0}input[aria-invalid=true]{border-color:var(--red)}[hidden]{display:none!important}.mono,code,.stat-val,.tab,table,.title-bar-text{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-variant-numeric:tabular-nums}.muted{color:var(--muted)}.positive{color:var(--green)}.negative{color:var(--red)}.amber{color:var(--amber)}.small{font-size:12px}.win98-window{max-width:1800px;margin:auto;min-height:100vh}.title-bar{display:flex;align-items:center;justify-content:space-between;padding:11px 22px;border-bottom:1px solid var(--border);gap:12px;background:var(--surface)}.title-bar-text{font-weight:600;font-size:12px;letter-spacing:.09em;display:flex;gap:10px;align-items:center}.app-icon{color:var(--accent);border:1px solid var(--accent);line-height:22px;text-align:center;width:24px;height:24px;font-size:17px}.title-bar-controls{display:flex;gap:6px}.title-bar-controls button{font-size:12px;min-height:32px;padding:4px 10px}.window-body{display:grid;grid-template-columns:184px minmax(0,1fr);min-height:calc(100vh - 57px)}.tabs{background:var(--surface);border-right:1px solid var(--border);padding:25px 10px;display:flex;flex-direction:column;gap:5px}.nav-label{font:11px ui-monospace,monospace;letter-spacing:.13em;color:var(--muted);padding:0 12px 12px}.tab{text-align:left;background:transparent;border:0;color:var(--muted);font-size:13px;padding:11px 12px}.tab.active{background:var(--surface2);color:var(--accent);box-shadow:inset 3px 0 var(--accent)}.tab-number{opacity:.5;margin-right:10px}.nav-bottom{margin-top:auto;padding:60px 12px 8px;font-size:11px;color:var(--muted)}.nav-bottom .status-dot{margin-right:6px}.status-dot{display:inline-block;width:6px;height:6px;background:var(--accent);border-radius:50%}.sidebar-summary{margin:24px 12px 0;border-top:1px solid var(--border);padding-top:18px;font-size:12px;color:var(--muted)}.sidebar-summary strong{display:block;color:var(--text);font-weight:500;margin-top:4px}.content{min-width:0;width:100%;max-width:1500px;padding:27px 28px 18px;margin:auto;align-self:start}.header{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:22px}.eyebrow{font:11px ui-monospace,monospace;color:var(--accent);letter-spacing:.14em;margin-bottom:5px}h1{font-size:28px;line-height:1.25;letter-spacing:-.045em;font-weight:650;margin:0 0 6px}h2{font-size:17px;font-weight:600;margin:0}h3{font-size:14px;margin:0 0 10px}p{margin:8px 0}.header p{margin:0;color:var(--muted);font-size:13px}.header-badge{font:11px ui-monospace,monospace;white-space:nowrap;color:var(--accent);background:var(--surface);padding:6px 10px;border:1px solid var(--border);border-radius:4px;margin-top:8px}.chart-card,.config-card,.info,.tbl-wrap{border:1px solid var(--border);background:var(--surface);border-radius:5px;margin-bottom:16px;min-width:0}.config-card summary{cursor:pointer;list-style:none;display:flex;gap:12px;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--surface2);border-radius:4px}.config-card summary::-webkit-details-marker{display:none}.config-card summary::after{content:'+';color:var(--accent);font:20px monospace}.config-card[open] summary::after{content:'−'}.config-card summary>span:last-of-type{margin-left:auto;text-align:right;font-size:12px;color:var(--muted)}.config-body{padding:17px 18px}.form-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:13px 16px}.field{display:flex;flex-direction:column;gap:5px}.field>label,.field>span,.field>legend{font-size:12px;color:var(--muted)}.field code{font-size:10px;color:var(--muted)}.field label.check{display:flex;gap:8px;align-items:center;min-height:20px;color:var(--text)}.span2{grid-column:span 2}.spacing-toggle{border:0;padding:0;margin:0}.spacing-options{display:flex;min-height:40px;border:1px solid var(--border);border-radius:4px;overflow:hidden}.spacing-options label{flex:1;display:flex;gap:7px;justify-content:center;align-items:center;background:var(--bg);font-size:12px;cursor:pointer}.spacing-options label:has(input:checked){background:var(--faint);color:var(--accent)}.spacing-options label+label{border-left:1px solid var(--border)}.config-meta{display:flex;align-items:center;gap:12px;justify-content:space-between;margin:12px 0 16px;padding-bottom:13px;border-bottom:1px solid var(--border);font-size:12px;color:var(--muted);flex-wrap:wrap}.text-btn{background:transparent;border:0;color:var(--accent);padding:2px 5px;min-height:28px;font-size:12px}.risk-row{display:grid;grid-template-columns:1fr 1fr 1.1fr;gap:16px;margin-top:14px;align-items:end}.actions{display:flex;gap:8px;justify-content:flex-end}.primary{background:var(--accent);color:var(--bg);font-weight:700;min-width:145px;border-color:var(--accent)}.primary:hover{background:var(--teal)}.config-footer{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-top:14px;font-size:11px;color:var(--muted)}.config-footer button{white-space:nowrap}.notice{padding:10px 14px;font-size:12px;margin:0 0 16px;border:1px solid var(--border);border-left:3px solid var(--accent);background:var(--surface);border-radius:4px}.notice.error{border-left-color:var(--red);color:var(--red)}.notice.warn{border-left-color:var(--amber);color:var(--amber)}.run-heading{display:flex;justify-content:space-between;gap:12px;align-items:center;margin:23px 0 12px}.run-heading h2{font-size:14px}.run-heading .muted{font-size:11px}.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:12px}.stat{background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:16px;min-width:0}.stat.featured{border-top:2px solid var(--accent)}.stat-label{font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:7px}.stat-val{font-size:clamp(21px,1.85vw,29px);font-weight:550;line-height:1.35;letter-spacing:-.04em;overflow-wrap:anywhere}.stat-sub{font-size:11px;color:var(--muted);margin-top:6px;min-height:17px}.balance-strip{display:grid;grid-template-columns:1.1fr 1fr 1.2fr 1fr;background:var(--surface);border:1px solid var(--border);border-radius:4px;margin-bottom:20px;padding:13px 0}.balance-strip>div{padding:0 16px;border-right:1px solid var(--border);min-width:0}.balance-strip>div:last-child{border:0}.balance-strip .mono{font-size:14px;margin-top:4px;overflow-wrap:anywhere}.chart-card{padding:17px 18px}.chart-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}.chart-title{font-size:13px;font-weight:600;display:flex;align-items:center;gap:8px}.chart-title span{color:var(--muted);font:10px ui-monospace,monospace;letter-spacing:.06em}.chart-tools{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:11px;color:var(--muted)}.chart-tools select{width:auto;min-height:30px;padding:3px 6px;font-size:11px}.legend{display:flex;align-items:center;gap:13px;flex-wrap:wrap;font-size:10px;color:var(--muted)}.legend b{font-weight:500}.legend .price-key{color:var(--amber)}.chart-wrap{position:relative;width:100%;min-width:0;height:365px}.chart-wrap.equity{height:200px}.chart-wrap.underwater{height:135px}.chart-foot{display:flex;justify-content:space-between;gap:10px;border-top:1px solid var(--border);margin-top:12px;padding-top:9px;color:var(--muted);font-size:10px}.progress{height:3px;background:var(--faint);margin-bottom:12px;border-radius:2px;overflow:hidden}.progress>div{width:0;height:100%;background:var(--accent)}.empty{padding:60px 20px;text-align:center;color:var(--muted)}.empty h2{color:var(--text);margin-bottom:6px}.toolbar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap}.toolbar select{width:auto;min-width:145px}.toolbar-actions{display:flex;gap:8px}.tbl-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:11px;white-space:nowrap}th{padding:11px 13px;background:var(--surface2);font-size:10px;color:var(--muted);font-weight:500;letter-spacing:.025em;text-align:right}td{text-align:right;padding:11px 13px;border-top:1px solid var(--border)}th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}tr:nth-child(even){background:color-mix(in srgb,var(--surface2) 45%,transparent)}tbody tr:hover{background:var(--faint)}.side-pill{display:inline-block;min-width:40px;font-size:10px;font-weight:600}.pagination{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:var(--muted)}.pagination button{font-size:12px}.info{padding:18px 20px}.info p,.info li{font-size:13px;color:var(--muted)}.info strong{color:var(--text);font-weight:550}.info code{color:var(--accent);font-size:12px;overflow-wrap:anywhere}.info ul{padding-left:19px}.method-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.method-grid .info{margin:0}.method-grid .wide{grid-column:1/-1}.method-table{white-space:normal;font-family:inherit}.method-table td{text-align:left;vertical-align:top;min-width:130px;color:var(--muted);font-size:12px}.method-table td:first-child{color:var(--text);width:160px}.method-table th{text-align:left}.footer{display:flex;justify-content:space-between;gap:16px;margin-top:26px;padding-top:15px;border-top:1px solid var(--border);font-size:11px;color:var(--muted)}#mobile-navigation{display:none}.nav-collapsed .tabs{display:none}.nav-collapsed .window-body{grid-template-columns:minmax(0,1fr)}.nav-collapsed #mobile-navigation{display:block;grid-column:1/-1;padding:10px 20px;background:var(--surface)}#mobile-navigation label{display:flex;gap:12px;align-items:center;font-size:12px}#mobile-view{max-width:320px}.panel{display:none}.panel.active{display:block}
+@media(min-width:1400px){.content{padding:30px 38px}.chart-wrap{height:410px}.stat{padding:18px}}
+@media(max-width:1100px){.window-body{grid-template-columns:160px minmax(0,1fr)}.content{padding:22px 20px}.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.g4{grid-template-columns:repeat(2,minmax(0,1fr))}.risk-row{grid-template-columns:1fr 1fr}.actions{grid-column:1/-1}.balance-strip{grid-template-columns:1fr 1fr;gap:12px}.balance-strip>div:nth-child(2){border:0}.method-grid{grid-template-columns:1fr}.method-grid .wide{grid-column:auto}}
+@media(max-width:800px){.window-body{display:block}.tabs{display:none}#mobile-navigation{display:block;position:sticky;top:0;z-index:20;padding:9px 16px;background:var(--surface);border-bottom:1px solid var(--border)}#mobile-view{max-width:none}.title-bar{padding:10px 16px}.title-bar-text{font-size:10px;letter-spacing:.025em}.content{padding:20px 16px}.chart-wrap{height:300px}.chart-wrap.equity{height:185px}.chart-header{flex-wrap:wrap}.header-badge{font-size:10px}.config-card summary>span:last-of-type{display:none}.header{gap:10px}.footer{flex-direction:column;gap:4px}.chart-foot{flex-wrap:wrap}}
+@media(max-width:480px){h1{font-size:25px}.title-bar-controls button{padding:4px 7px}.app-icon{display:none}.header-badge{display:none}.config-body{padding:14px}.form-grid{gap:11px}.span2{grid-column:span 2}.risk-row{gap:10px}.config-footer{align-items:flex-start;flex-direction:column}.config-meta{gap:4px}.stat{padding:12px}.stat-val{font-size:22px}.stat-label{font-size:9px}.stat-sub{font-size:10px}.g4{gap:8px}.balance-strip>div{padding:0 12px}.balance-strip .mono{font-size:12px}.chart-card{padding:14px 12px}.chart-title span{display:none}.run-heading{flex-wrap:wrap}.legend{gap:9px}.method-table td{min-width:105px}.toolbar-actions{width:100%}.toolbar-actions button{flex:1}.chart-wrap{height:260px}.config-card summary{padding:12px 14px}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="win98-window">
+  <div class="title-bar"><div class="title-bar-text"><span class="app-icon" aria-hidden="true">₿</span> BTC / RESEARCH TERMINAL</div><div class="title-bar-controls"><button id="theme-toggle" aria-label="Switch color theme">Light mode</button><button id="nav-toggle" aria-label="Toggle navigation" aria-expanded="true">☰</button></div></div>
+  <div class="window-body">
+    <nav class="tabs" aria-label="Analysis views">
+      <div class="nav-label">GRID LAB / V1.0</div>
+      <button class="tab active" data-view="backtest" aria-current="page"><span class="tab-number">01</span>Backtest</button>
+      <button class="tab" data-view="trades"><span class="tab-number">02</span>Trade log</button>
+      <button class="tab" data-view="method"><span class="tab-number">03</span>Methodology</button>
+      <div class="sidebar-summary">STRATEGY<strong>Simple spot grid</strong><br>MARKET<strong>BTC / USD</strong><br>EXECUTION<strong>Close crossings</strong></div>
+      <div class="nav-bottom"><span class="status-dot"></span>Runs in your browser<br>No account required.</div>
+    </nav>
+    <div id="mobile-navigation"><label for="mobile-view">View<select id="mobile-view"><option value="backtest">01 · Backtest</option><option value="trades">02 · Trade log</option><option value="method">03 · Methodology</option></select></label></div>
+    <main class="content">
+      <header class="header"><div><div class="eyebrow">STRATEGY SANDBOX</div><h1>BTC Grid Sandbox</h1><p>Set a range. Test the cycles. Measure the edge.</p></div><div class="header-badge"><span class="status-dot"></span> SIMPLE GRID · CLOSE ONLY</div></header>
+      <div id="error" class="notice error" role="alert" hidden></div>
+      <div id="status" class="notice" role="status" aria-live="polite">Loading BTC prices…</div>
+      <div id="progress" class="progress" hidden><div id="progress-bar"></div></div>
+      <section class="panel active" id="panel-backtest" aria-label="Backtest">
+        <details class="config-card" id="configuration" open>
+          <summary><strong>Strategy configuration</strong><span id="config-summary">Simple grid · fixed order size</span></summary>
+          <form id="config-form" class="config-body" novalidate>
+            <div class="form-grid">
+              <div class="field"><label for="granularity">Granularity</label><select id="granularity" name="trading_settings.timeframe"><option value="1d">Daily · 1D</option><option value="4h" selected>4 hours · 4H</option><option value="1h">1 hour · 1H</option></select></div>
+              <div class="field"><label for="start-date">From (UTC)</label><input id="start-date" name="trading_settings.period.start_date" type="datetime-local" required></div>
+              <div class="field"><label for="end-date">To (UTC)</label><input id="end-date" name="trading_settings.period.end_date" type="datetime-local" required></div>
+              <div class="field"><label for="initial-balance">Initial balance · USD</label><input id="initial-balance" name="trading_settings.initial_balance" type="number" min="0.01" max="1000000000000" step="any" value="10000" required></div>
+            </div>
+            <div class="config-meta"><span id="coverage">Fetching the selected file…</span><span><button type="button" class="text-btn" data-period="90">90D</button><button type="button" class="text-btn" data-period="365">1Y</button><button type="button" class="text-btn" data-period="all">All data</button><button type="button" class="text-btn" id="retry">↻ Reload data</button></span></div>
+            <div class="form-grid">
+              <div class="field"><label for="bottom">Range bottom · USD</label><input id="bottom" name="grid_strategy.range.bottom" type="number" min="0.00000001" step="any" required></div>
+              <div class="field"><label for="top">Range top · USD</label><input id="top" name="grid_strategy.range.top" type="number" min="0.00000001" step="any" required></div>
+              <div class="field"><label for="num-grids">Number of grid levels</label><input id="num-grids" name="grid_strategy.num_grids" type="number" min="2" max="200" step="1" value="20" required></div>
+              <fieldset class="field spacing-toggle"><legend>Spacing type</legend><div class="spacing-options"><label><input type="radio" name="spacing" value="arithmetic" checked>Arithmetic</label><label><input type="radio" name="spacing" value="geometric">Geometric</label></div></fieldset>
+              <div class="field"><label for="fee">Trading fee · % per fill</label><input id="fee" name="exchange.trading_fee" type="number" min="0" max="10" step="any" value="0.1" required></div>
+              <div class="field"><label for="strategy">Strategy</label><select id="strategy" name="grid_strategy.type"><option value="simple_grid">Simple grid</option></select></div>
+              <div class="field span2"><span>Grid preview</span><div id="grid-preview" class="small muted" style="padding-top:8px">Waiting for data…</div></div>
+            </div>
+            <div class="risk-row">
+              <div class="field"><label class="check" for="tp-enabled"><input type="checkbox" id="tp-enabled" name="risk_management.take_profit.enabled">Take profit · BTC price</label><input id="tp" aria-label="Take-profit threshold in USD" name="risk_management.take_profit.threshold" type="number" min="0.00000001" step="any" disabled></div>
+              <div class="field"><label class="check" for="sl-enabled"><input type="checkbox" id="sl-enabled" name="risk_management.stop_loss.enabled">Stop loss · BTC price</label><input id="sl" aria-label="Stop-loss threshold in USD" name="risk_management.stop_loss.threshold" type="number" min="0.00000001" step="any" disabled></div>
+              <div class="actions"><button type="button" id="reset">Reset</button><button type="submit" id="run" class="primary" disabled>▶ Run backtest</button></div>
+            </div>
+            <div class="config-footer"><span id="selection-note">Dates are bounded to the loaded file. All timestamps are UTC.</span><button type="button" class="text-btn" id="center-range">Center range on first close ±20%</button></div>
+          </form>
+        </details>
+        <div id="results" hidden>
+          <div class="run-heading"><h2>Performance overview <span class="muted" id="result-period"></span></h2><span id="run-state" class="mono small positive"></span></div>
+          <div class="g4">
+            <article class="stat featured"><div class="stat-label">Grid ROI · net of fees</div><div class="stat-val" id="roi">—</div><div class="stat-sub" id="edge">—</div></article>
+            <article class="stat featured"><div class="stat-label">Buy &amp; hold return</div><div class="stat-val" id="buy-hold">—</div><div class="stat-sub">Same window · price return, no fees</div></article>
+            <article class="stat"><div class="stat-label">Max drawdown</div><div class="stat-val negative" id="max-dd">—</div><div class="stat-sub">Equity decline from prior peak</div></article>
+            <article class="stat"><div class="stat-label">Max runup</div><div class="stat-val positive" id="max-runup">—</div><div class="stat-sub">Equity rise from prior trough</div></article>
+          </div>
+          <div class="g4">
+            <article class="stat"><div class="stat-label">Sharpe ratio</div><div class="stat-val" id="sharpe">—</div><div class="stat-sub">Annualized · 3% risk-free rate</div></article>
+            <article class="stat"><div class="stat-label">Sortino ratio</div><div class="stat-val" id="sortino">—</div><div class="stat-sub">Bot convention · downside sample SD</div></article>
+            <article class="stat"><div class="stat-label">Total fees paid</div><div class="stat-val" id="fees">—</div><div class="stat-sub" id="fees-sub">Every buy, sell &amp; market fill</div></article>
+            <article class="stat"><div class="stat-label">Buy / sell fills</div><div class="stat-val" id="trades-count">—</div><div class="stat-sub" id="trades-sub">Includes initialization &amp; risk exits</div></article>
+          </div>
+          <div class="balance-strip">
+            <div><div class="stat-label">Final equity</div><div class="mono" id="final-equity">—</div></div>
+            <div><div class="stat-label">Fiat balance</div><div class="mono" id="final-fiat">—</div></div>
+            <div><div class="stat-label">Crypto balance</div><div class="mono" id="final-crypto">—</div></div>
+            <div><div class="stat-label">Total P&amp;L</div><div class="mono" id="final-pnl">—</div></div>
+          </div>
+          <div id="model-note" class="notice"><strong>Close-only simulation.</strong> Grid fills occur at crossed levels between consecutive closes, in price order. Intrabar highs/lows, tick paths, slippage and liquidity are unknown.</div>
+          <div id="run-notes" class="notice warn" hidden></div>
+          <div id="chart-error" class="notice error" hidden></div>
+          <article class="chart-card"><div class="chart-header"><div class="chart-title">Price &amp; grid execution <span>BTC / USD</span></div><div class="chart-tools"><label for="chart-window">Chart window</label><select id="chart-window"><option value="all">Full backtest</option><option value="90">Last 90 days</option><option value="30">Last 30 days</option><option value="7">Last 7 days</option></select></div></div><div class="legend"><b class="price-key">━ BTC close</b><b class="positive">▲ Buy / lower grid</b><b class="negative">▼ Sell / upper grid</b><b>┄ Center</b></div><div class="chart-wrap"><canvas id="price-chart" role="img" aria-label="BTC close price, horizontal grid levels, and buy and sell fill markers"></canvas></div><div class="chart-foot"><span id="price-foot">—</span><span>Triangles include seed purchase &amp; risk liquidation.</span></div></article>
+          <article class="chart-card"><div class="chart-header"><div class="chart-title">Equity curve <span>MARKED TO MARKET · USD</span></div><div class="legend"><b class="positive">━ Grid equity</b><b class="price-key">┄ Buy &amp; hold</b></div></div><div class="chart-wrap equity"><canvas id="equity-chart" role="img" aria-label="Grid portfolio equity compared with buy and hold"></canvas></div><div class="chart-foot"><span id="equity-foot">—</span><span>Statistics always use the full backtest window.</span></div></article>
+          <article class="chart-card"><div class="chart-header"><div class="chart-title">Underwater <span>DRAWDOWN FROM RUNNING EQUITY PEAK</span></div><span id="dd-label" class="small negative mono"></span></div><div class="chart-wrap underwater"><canvas id="dd-chart" role="img" aria-label="Percentage drawdown below the running equity peak"></canvas></div></article>
+        </div>
+        <div id="empty" class="info empty"><h2>Your range, put to the test.</h2><p>The default run starts automatically when prices load.<br>Change the inputs above to explore another setup.</p></div>
+      </section>
+      <section class="panel" id="panel-trades" aria-label="Trade log">
+        <div class="toolbar"><div><h2>Trade log</h2><div class="small muted" id="log-meta">Run a backtest to inspect fills.</div></div><div class="toolbar-actions"><button id="export-trades" disabled>↓ Trades CSV</button><button id="export-config" disabled>↓ Run JSON</button></div></div>
+        <p class="small muted">Running P&amp;L = fiat + BTC marked at this fill price − starting capital, after fees. Realized P&amp;L uses average inventory cost. Orders sharing a level remain independent.</p>
+        <div class="toolbar"><label for="side-filter" class="small muted">Fill filter <select id="side-filter"><option value="all">All fills</option><option value="buy">Buys</option><option value="sell">Sells</option><option value="grid">Grid fills only</option><option value="market">Seed / risk exits</option></select></label><span id="log-count" class="small mono muted">0 fills</span></div>
+        <div class="tbl-wrap"><table><thead><tr><th scope="col">Side</th><th scope="col">Timestamp · UTC</th><th scope="col">Price · USD</th><th scope="col">Quantity · BTC</th><th scope="col">Grid / cycle</th><th scope="col">Fee · USD</th><th scope="col">Running P&amp;L</th><th scope="col">Realized P&amp;L</th></tr></thead><tbody id="trade-body"><tr><td colspan="8">No run yet.</td></tr></tbody></table></div>
+        <div class="pagination"><span id="page-info">Page 0 of 0</span><div><button id="prev-page" disabled>← Previous</button> <button id="next-page" disabled>Next →</button></div></div>
+      </section>
+      <section class="panel" id="panel-method" aria-label="Methodology">
+        <div class="toolbar"><h2>How this backtest works</h2><span class="small mono muted">SIMPLE SPOT GRID / V1</span></div>
+        <div class="method-grid">
+          <article class="info"><h3>01 · Range &amp; initialization</h3><p><strong>N grid levels include both endpoints</strong>, so there are N − 1 intervals. Arithmetic: <code>Lᵢ = bottom + i × (top − bottom)/(N − 1)</code>. Geometric: <code>Lᵢ = bottom × (top/bottom)^(i/(N − 1))</code>.</p><p>The central / trigger reference is always <code>(top + bottom)/2</code>, including geometric spacing. Trading starts at the first observed close inside the range; it does not wait for the exact midpoint.</p><p>Start with all fiat, then buy <strong>50% of initial balance as BTC notional</strong> at activation, with the entry fee paid from remaining fiat. Every grid order has fixed BTC quantity <code>initial_balance / N / activation_close</code>. No leverage or shorting.</p><p>Following the bot’s initial filters, buys start on levels at/below center and strictly below the activation close; sells start above both center and the activation close. A level equal to activation is not filled retroactively.</p></article>
+          <article class="info"><h3>02 · Orders &amp; available funds</h3><p>A filled buy places its same-size sell exactly <strong>one level up</strong>; a filled sell places its buy <strong>one level down</strong>. Each initial order is an independent cycle, so different cycles can later share a price. No rebalancing or compounding of quantity.</p><p>Resting buys reserve their full cash cost including fees; resting sells reserve BTC. Newly paired orders have funding priority, then other waiting orders nearest to the current price. An unfunded order cannot fill; it waits for funds and a subsequent crossing. These skipped crossings are reported.</p><p>Downward close moves fill crossed buys from highest to lowest; upward moves fill sells from lowest to highest. Arriving exactly on a level counts once. The previous close is excluded, the new close included. No trades are inferred for a flat bar.</p><p>Fees are <code>quantity × execution_price × fee_rate</code> in USD on every fill, including the seed buy and liquidation. Partial fills, exchange lot-size rules and slippage are not modeled.</p></article>
+          <article class="info"><h3>03 · Risk exits &amp; valuation</h3><p>TP and SL are <strong>absolute BTC price thresholds in USD</strong>, as in the bot config. After that bar’s crossed grid orders, TP triggers at <code>close ≥ TP</code> and SL at <code>close ≤ SL</code>. All pending orders are canceled and all BTC is sold at the <strong>observed close</strong>, with a fee. A breached threshold at activation closes immediately.</p><p>After an exit, the strategy stays in fiat until the selected end, preserving the same comparison window as buy &amp; hold. If never activated, the portfolio stays in cash. At ordinary end-of-test, remaining BTC is marked at the last close and <strong>not forcibly sold</strong>.</p><p>Running trade-log P&amp;L is marked at each execution price; equity charts mark at each close. Realized P&amp;L uses weighted average cost including buy fees and net sell proceeds. Total P&amp;L includes both realized and unrealized inventory.</p></article>
+          <article class="info"><h3>04 · Close-only data</h3><p>Data loads directly from the three <a href="https://github.com/0xtrvkc/dynamic-btc-analytics-dashboard" target="_blank" rel="noopener noreferrer">BTC dashboard JSON files</a>. Naive timestamps are interpreted as UTC. Records are sorted, and nonpositive / invalid observations are excluded and counted. Picker limits come from each loaded file.</p><p><strong>A close-to-close path is an approximation.</strong> It misses within-bar round trips and assumes fills at each crossed limit price. Missing intervals are not fabricated: crossings over gaps still use the two observed endpoints, and gaps are reported. Ratios assume the nominal interval.</p><p>Charts may reduce line points while preserving bucket extrema for display; every original selected bar and every fill is used for statistics. The chart-window selector changes only the visible charts.</p><p>Default dates use the last year. The default grid uses ±20% around the <strong>first selected close</strong>, never future highs/lows. Internet access is needed for data and the two chart libraries. No exchange connection or backend.</p></article>
+          <article class="info wide"><h3>05 · Metric definitions</h3><div class="tbl-wrap" style="margin:0"><table class="method-table"><thead><tr><th>Metric</th><th>Calculation / convention</th></tr></thead><tbody>
+            <tr><td>ROI / edge</td><td>100 × (final fiat + final BTC × last close − initial balance) / initial balance. Edge is grid ROI minus gross buy &amp; hold return, in percentage points.</td></tr>
+            <tr><td>Buy &amp; hold</td><td>100 × (last close / first selected close − 1), without fees, matching the analyzer’s price-return benchmark. Equity line starts with the same initial capital.</td></tr>
+            <tr><td>Drawdown / runup</td><td>Largest percentage decline from a prior running equity peak / rise from a prior running trough. Include pre-entry capital in the initial peak/trough. Underwater is the signed, negative drawdown series.</td></tr>
+            <tr><td>Sharpe</td><td>Per-bar return r = Eₜ/Eₜ₋₁ − 1; excess x = r − 0.03/A. Sharpe = mean(x) / sample_SD(x) × √A. A = 365, 2,190 or 8,760 for 1D, 4H or 1H. Sample SD uses n − 1.</td></tr>
+            <tr><td>Sortino</td><td>Matches the bot’s convention: mean(x) / sample_SD(x where x &lt; 0) × √A. This is conditional downside sample deviation, not downside RMS. If downside SD is undefined or ≤ 1e−9, use mean(x) × √A; if Sharpe SD is undefined or ≤ 1e−9, use 0. Fewer than two closes gives N/A.</td></tr>
+            <tr><td>Fee / ratio timing</td><td>ROI, balances and drawdown include the seed fee. Ratios use consecutive observed close-equities; a seed fee already in the very first observation is not a separate return interval. Cash after an early exit earns 0%.</td></tr>
+          </tbody></table></div></article>
+          <article class="info wide"><h3>06 · Reference &amp; deliberate scope</h3><p>Inspired by <a href="https://github.com/jordantete/grid_trading_bot/blob/master/docs/concepts/grid-trading.md" target="_blank" rel="noopener noreferrer">grid_trading_bot concepts</a>, <a href="https://github.com/jordantete/grid_trading_bot/blob/master/config/config.json" target="_blank" rel="noopener noreferrer">config</a>, <a href="https://github.com/jordantete/grid_trading_bot/blob/master/src/grid_trading_bot/strategies/trading_performance_analyzer.py" target="_blank" rel="noopener noreferrer">performance analyzer</a> and <a href="https://github.com/jordantete/grid_trading_bot/blob/master/src/grid_trading_bot/strategies/plotter.py" target="_blank" rel="noopener noreferrer">plotter</a> (reviewed 14 September 2026). The current upstream implementation uses a different geometric center and its simple-grid sell search can choose the next available sell level. This sandbox follows the requested <strong>arithmetic midpoint and exactly adjacent pairing</strong>, and fixes order size from original capital. It is not a byte-for-byte reproduction of upstream backtests. Hedged grid is outside this v1.</p><p>Visual tokens and window chrome follow the sibling BTC dashboard. Charts: Chart.js 4.4.1 (cdnjs) + annotation 3.0.1 (jsDelivr). Run JSON includes the config shape, dataset coverage and a SHA-256 digest of the selected observations when available, plus results for reproducibility.</p></article>
+        </div>
+      </section>
+      <footer class="footer"><span>BTC GRID LAB · Browser-based research</span><span>Historical simulation. Not financial advice.</span></footer>
+    </main>
+  </div>
+</div>
+<noscript><p>This sandbox needs JavaScript enabled to fetch data, simulate trades and draw charts.</p></noscript>
+<script id="grid-engine">
+/* Pure deterministic engine. It is also loaded unchanged into a Blob Worker.
+   Currency: USD cash; BTC inventory. No network or DOM access in this block. */
+var GridEngine = (() => {
+  'use strict';
+  const DAY = 86400000, INTERVALS = {'1d':DAY,'4h':DAY/6,'1h':DAY/24};
+  function parseData(raw) {
+    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error('Expected a flat {date: close} JSON object.');
+    const byTime = new Map(); let invalid=0,duplicates=0;
+    for (const [key,value] of Object.entries(raw)) {
+      const s=key.trim(), match=s.match(/^(\d{4}-\d{2}-\d{2})(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})?)?$/);
+      if (!match || typeof value !== 'number' || !Number.isFinite(value) || value<=0) {invalid++;continue;}
+      const dateCheck=Date.parse(match[1]+'T00:00:00Z');
+      if (!Number.isFinite(dateCheck) || new Date(dateCheck).toISOString().slice(0,10)!==match[1]) {invalid++;continue;}
+      const t=Date.parse(s.length===10?s+'T00:00:00Z':(/[Zz]|[+-]\d{2}:\d{2}$/.test(s)?s:s+'Z'));
+      if(!Number.isFinite(t)){invalid++;continue;}
+      if(byTime.has(t))duplicates++;
+      byTime.set(t,{t,p:value});
+    }
+    const bars=[...byTime.values()].sort((a,b)=>a.t-b.t);
+    if(bars.length<2)throw new Error('The file must contain at least two valid positive close prices.');
+    return {bars,invalid,duplicates};
+  }
+  function generateLevels(bottom,top,n,spacing) {
+    if(!Number.isFinite(bottom)||!Number.isFinite(top)||bottom<=0||top<=bottom)throw new Error('Range top must be greater than a positive range bottom.');
+    if(!Number.isInteger(n)||n<2||n>200)throw new Error('Use an integer from 2 to 200 for grid levels.');
+    if(!['arithmetic','geometric'].includes(spacing))throw new Error('Choose arithmetic or geometric spacing.');
+    const levels=Array.from({length:n},(_,i)=>spacing==='arithmetic'?bottom+(top-bottom)*i/(n-1):Math.exp(Math.log(bottom)+(Math.log(top)-Math.log(bottom))*i/(n-1)));
+    levels[0]=bottom;levels[n-1]=top;
+    if(levels.some((v,i)=>!Number.isFinite(v)||(i>0&&v<=levels[i-1])))throw new Error('Grid prices are too close together for numeric precision.');
+    return levels;
+  }
+  function mean(a){return a.length?a.reduce((s,x)=>s+x,0)/a.length:0;}
+  function sd(a){if(a.length<2)return NaN;const m=mean(a);return Math.sqrt(a.reduce((s,x)=>s+(x-m)**2,0)/(a.length-1));}
+  function ratios(equities,interval) {
+    const A=365*DAY/interval;
+    if(equities.length<2)return {sharpe:null,sortino:null,ratioFallback:true};
+    const excess=equities.slice(1).map((v,i)=>v/equities[i]-1-0.03/A),m=mean(excess),s=sd(excess),down=sd(excess.filter(v=>v<0));
+    return {sharpe:s>1e-9?m/s*Math.sqrt(A):0,sortino:down>1e-9?m/down*Math.sqrt(A):m*Math.sqrt(A),ratioFallback:!(s>1e-9)||!(down>1e-9)};
+  }
+  function simulate(bars,cfg,progress=()=>{}) {
+    const B=cfg.initialBalance,fee=cfg.feeRate,interval=INTERVALS[cfg.granularity];
+    if(!Number.isFinite(B)||B<=0||B>1e12)throw new Error('Initial balance must be positive and no more than 1 trillion USD.');
+    if(!Number.isFinite(fee)||fee<0||fee>0.1)throw new Error('Trading fee must be between 0% and 10%.');
+    if(!interval)throw new Error('Unsupported granularity.');
+    for(const risk of ['tp','sl'])if(cfg[risk]!=null&&(!Number.isFinite(cfg[risk])||cfg[risk]<=0))throw new Error('Enabled TP/SL thresholds must be positive BTC prices.');
+    if(cfg.tp!=null&&cfg.sl!=null&&cfg.tp<=cfg.sl)throw new Error('Take profit must be above stop loss.');
+    if(!Array.isArray(bars)||bars.length<2)throw new Error('Select at least two observed price bars.');
+    if(bars.some((b,i)=>!Number.isFinite(b.p)||b.p<=0||!Number.isFinite(b.t)||(i&&b.t<=bars[i-1].t)))throw new Error('Price bars must be positive and strictly chronological.');
+    const levels=generateLevels(cfg.bottom,cfg.top,cfg.numGrids,cfg.spacing),center=cfg.bottom+(cfg.top-cfg.bottom)/2;
+    let fiat=B,btc=0,basis=0,realized=0,totalFees=0,reservedFiat=0,reservedBTC=0,qty=0,active=false,exited=false;
+    let activation=null,exit=null,orders=[],buys=0,sells=0,skipped=0,missing=0,peak=B,trough=B,maxDD=0,maxRunup=0;
+    const trades=[],rows=[],cashTolerance=Math.max(B*1e-12,1e-10);
+    function execute(side,price,q,t,index,cycle,kind){
+      const gross=q*price,cost=gross*fee;
+      if(side==='buy'){
+        if(gross+cost>fiat+cashTolerance)throw new Error('Accounting invariant failed: insufficient cash.');
+        fiat-=gross+cost;btc+=q;basis+=gross+cost;buys++;
+      }else{
+        if(q>btc+Math.max(q,btc)*1e-10)throw new Error('Accounting invariant failed: insufficient BTC.');
+        const allocated=btc>0?basis*(q/btc):0;
+        realized+=gross-cost-allocated;basis-=allocated;btc-=q;fiat+=gross-cost;sells++;
+        if(Math.abs(btc)<Math.max(q*1e-10,1e-16)){btc=0;basis=0;}
+      }
+      if(fiat<0&&fiat>-cashTolerance)fiat=0;
+      totalFees+=cost;
+      trades.push({side,price,qty:q,t,level:index==null?null:index+1,cycle,kind,fee:cost,pnl:fiat+btc*price-B,realized,fiat,btc});
+      if(trades.length>500000)throw new Error('More than 500,000 fills. Narrow the date range or reduce grid levels.');
+    }
+    function fund(order){
+      if(order.funded)return;
+      if(order.side==='buy'){
+        const required=qty*levels[order.index]*(1+fee);
+        if(required<=fiat-reservedFiat+cashTolerance){reservedFiat+=required;order.funded=true;}
+      }else if(qty<=btc-reservedBTC+Math.max(qty*1e-10,1e-16)){reservedBTC+=qty;order.funded=true;}
+    }
+    function fundWaiting(price,priority){
+      if(priority)fund(priority);
+      const waiting=orders.filter(o=>!o.funded).sort((a,b)=>Math.abs(levels[a.index]-price)-Math.abs(levels[b.index]-price)||a.id-b.id);
+      for(const order of waiting)fund(order);
+    }
+    for(let i=0;i<bars.length;i++){
+      const {t,p}=bars[i];
+      if(i>0)missing+=Math.max(0,Math.round((t-bars[i-1].t)/interval)-1);
+      if(!active&&!exited&&p>=cfg.bottom&&p<=cfg.top){
+        active=true;activation={t,price:p,index:i};qty=B/cfg.numGrids/p;
+        execute('buy',p,B/2/p,t,null,null,'seed');
+        for(let k=0;k<levels.length;k++){
+          if(levels[k]<=center&&levels[k]<p)orders.push({id:k+1,side:'buy',index:k,funded:false});
+          else if(levels[k]>center&&levels[k]>p)orders.push({id:k+1,side:'sell',index:k,funded:false});
+        }
+        fundWaiting(p);
+      }else if(active&&i>0){
+        const prev=bars[i-1].p,side=p<prev?'buy':p>prev?'sell':null;
+        if(side){
+          const indices=levels.map((v,k)=>k).filter(k=>side==='buy'?p<=levels[k]&&levels[k]<prev:prev<levels[k]&&levels[k]<=p);
+          if(side==='buy')indices.reverse();
+          for(const k of indices){
+            const atLevel=orders.filter(o=>o.side===side&&o.index===k).sort((a,b)=>a.id-b.id);
+            for(const order of atLevel){
+              if(!order.funded){skipped++;continue;}
+              if(side==='buy')reservedFiat-=qty*levels[k]*(1+fee);else reservedBTC-=qty;
+              reservedFiat=Math.max(0,reservedFiat);reservedBTC=Math.max(0,reservedBTC);
+              execute(side,levels[k],qty,t,k,order.id,'grid');
+              order.side=side==='buy'?'sell':'buy';order.index=k+(side==='buy'?1:-1);order.funded=false;
+              if(order.index<0||order.index>=levels.length)throw new Error('Invalid paired grid level.');
+              fundWaiting(levels[k],order);
+            }
+          }
+        }
+      }
+      if(active){
+        const reason=cfg.tp!=null&&p>=cfg.tp?'take-profit':cfg.sl!=null&&p<=cfg.sl?'stop-loss':null;
+        if(reason){
+          orders=[];reservedFiat=0;reservedBTC=0;
+          if(btc>0)execute('sell',p,btc,t,null,null,reason);
+          active=false;exited=true;exit={t,price:p,reason};
+        }
+      }
+      const equity=fiat+btc*p;
+      if(!Number.isFinite(equity)||equity<=0||fiat<-cashTolerance||btc<0)throw new Error('Non-finite or negative account value. Check the range and sizing.');
+      if(reservedFiat>fiat+cashTolerance*10||reservedBTC>btc+Math.max(qty*1e-9,1e-15))throw new Error('Reserved funds exceed available balances.');
+      peak=Math.max(peak,equity);trough=Math.min(trough,equity);
+      const dd=(equity/peak-1)*100,runup=(equity/trough-1)*100;
+      maxDD=Math.max(maxDD,-dd);maxRunup=Math.max(maxRunup,runup);
+      rows.push({t,p,equity,dd,buyHold:B*p/bars[0].p});
+      if(i%4096===0)progress(i/bars.length);
+    }
+    const last=rows[rows.length-1],pnl=last.equity-B,unrealized=btc*last.p-basis;
+    if(Math.abs(realized+unrealized-pnl)>Math.max(1e-7,B*1e-8))throw new Error('P&L accounting failed to reconcile.');
+    return {config:{...cfg},levels,center,qty,rows,trades,activation,exit,missing,skipped,openOrders:orders.length,unfundedOrders:orders.filter(o=>!o.funded).length,reservedFiat,reservedBTC,
+      stats:{roi:pnl/B*100,buyHold:(last.p/bars[0].p-1)*100,maxDD,maxRunup,totalFees,buys,sells,fiat,btc,equity:last.equity,pnl,realized,unrealized,...ratios(rows.map(r=>r.equity),interval)}};
+  }
+  return Object.freeze({parseData,generateLevels,ratios,simulate,INTERVALS,DAY});
+})();
+</script>
+<script>
+(() => {
+  'use strict';
+  const $=id=>document.getElementById(id),ROOT='https://raw.githubusercontent.com/0xtrvkc/dynamic-btc-analytics-dashboard/main/';
+  const FILES={'1d':'btc_daily_price.json','4h':'btc_4h_price.json','1h':'btc_1h_price.json'},cache=new Map();
+  let dataset=null,loadedGranularity=null,result=null,charts=[],worker=null,workerURL=null,fetchController=null,loadId=0,busy=false,loadBusy=false,dirty=false,page=0,loadTime=null;
+  const usd=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}),int=new Intl.NumberFormat('en-US');
+  const money=v=>usd.format(v),pct=v=>(v>0?'+':'')+v.toFixed(2)+'%',num=v=>int.format(v),iso=t=>new Date(t).toISOString(),stamp=t=>iso(t).slice(0,16).replace('T',' ');
+  const btcFmt=v=>v.toLocaleString('en-US',{minimumFractionDigits:8,maximumFractionDigits:8}),set=(id,v)=>$(id).textContent=v;
+  const tone=(id,v)=>{$(id).classList.remove('positive','negative');if(v!==0)$(id).classList.add(v>0?'positive':'negative');};
+  function showError(message){set('error',message);$('error').hidden=false;}
+  function showStatus(message,warn=false){set('status',message);$('status').classList.toggle('warn',warn);}
+  function updateButtons(){
+    for(const control of $('config-form').querySelectorAll('input,select,button')){
+      if(['run','reset','retry'].includes(control.id))continue;
+      control.disabled=busy||(control.id==='tp'&&!$('tp-enabled').checked)||(control.id==='sl'&&!$('sl-enabled').checked);
+    }
+    $('run').disabled=busy||loadBusy||!dataset||loadedGranularity!==$('granularity').value;$('retry').disabled=busy||loadBusy;
+  }
+  function markDirty(){dirty=!!result;if(result)showStatus('Inputs changed — press Run backtest to update the results.',true);updatePreview();}
+  function picker(t,gran){return iso(t).slice(0,gran==='1d'?10:16);}
+  function inputTime(id,isEnd=false){const s=$(id).value;if(!s)return NaN;return Date.parse(s+(s.length===10?'T00:00:00Z':'Z'))+(isEnd&&s.length===10?GridEngine.DAY-1:0);}
+  function selectedBars(){if(!dataset)return [];const start=inputTime('start-date'),end=inputTime('end-date',true);return dataset.bars.filter(b=>b.t>=start&&b.t<=end);}
+  function setPeriod(days){if(!dataset)return;const bars=dataset.bars,end=bars.at(-1).t,start=days==='all'?bars[0].t:Math.max(bars[0].t,end-Number(days)*GridEngine.DAY);$('start-date').value=picker(start,loadedGranularity);$('end-date').value=picker(end,loadedGranularity);markDirty();}
+  function centerRange(){const b=selectedBars()[0];if(!b)return;const precision=Math.max(0,4-Math.floor(Math.log10(b.p)));$('bottom').value=(b.p*.8).toFixed(precision);$('top').value=(b.p*1.2).toFixed(precision);$('tp').value=(b.p*1.25).toFixed(precision);$('sl').value=(b.p*.75).toFixed(precision);markDirty();}
+  function readConfig(){return {granularity:$('granularity').value,initialBalance:Number($('initial-balance').value),bottom:Number($('bottom').value),top:Number($('top').value),numGrids:Number($('num-grids').value),spacing:document.querySelector('input[name=spacing]:checked').value,feeRate:Number($('fee').value)/100,tp:$('tp-enabled').checked?Number($('tp').value):null,sl:$('sl-enabled').checked?Number($('sl').value):null};}
+  function updatePreview(){
+    const c=readConfig();
+    try{const levels=GridEngine.generateLevels(c.bottom,c.top,c.numGrids,c.spacing),center=c.bottom+(c.top-c.bottom)/2,step=c.spacing==='arithmetic'?money(levels[1]-levels[0])+' / step':((levels[1]/levels[0]-1)*100).toFixed(3)+'% / step';set('grid-preview','Center '+money(center)+' · '+step+' · '+(c.numGrids-1)+' intervals');set('config-summary',c.numGrids+' levels · '+c.spacing+' · '+(c.feeRate*100).toLocaleString('en-US',{maximumFractionDigits:4})+'% fee');}
+    catch{set('grid-preview','Enter a positive range with top > bottom and 2–200 levels.');}
+    if(dataset){const bars=selectedBars();set('selection-note',bars.length?num(bars.length)+' selected bars · '+stamp(bars[0].t)+' → '+stamp(bars.at(-1).t)+' UTC':'No observed bars in the selected date range.');}
+  }
+  async function loadData({resetDates=false,defaults=false,autoRun=false,reload=false}={}){
+    const id=++loadId,gran=$('granularity').value;loadBusy=true;updateButtons();if(fetchController)fetchController.abort();
+    $('error').hidden=true;showStatus('Loading '+FILES[gran]+'…');set('coverage','Fetching the selected file…');
+    try{
+      let item=reload?null:cache.get(gran);
+      if(!item){
+        fetchController=new AbortController();const controller=fetchController,timeout=setTimeout(()=>controller.abort(),35000);
+        try{const response=await fetch(ROOT+FILES[gran],{signal:controller.signal,cache:reload?'reload':'default'});if(!response.ok)throw new Error('Price request returned HTTP '+response.status+'.');item={...GridEngine.parseData(await response.json()),fetchedAt:new Date().toISOString()};cache.set(gran,item);}
+        finally{clearTimeout(timeout);}
+      }
+      if(id!==loadId)return;dataset=item;loadedGranularity=gran;loadTime=item.fetchedAt;
+      const first=item.bars[0].t,last=item.bars.at(-1).t;
+      for(const name of ['start-date','end-date']){
+        const input=$(name),old=input.value;
+        input.type=gran==='1d'?'date':'datetime-local';input.step=gran==='1d'?'1':String(GridEngine.INTERVALS[gran]/1000);input.min=picker(first,gran);input.max=picker(last,gran);
+        const converted=gran==='1d'?old.slice(0,10):old.length===10?old+'T00:00':old;
+        input.value=!resetDates&&converted?(converted<input.min?input.min:converted>input.max?input.max:converted):picker(name==='start-date'?Math.max(first,last-365*GridEngine.DAY):last,gran);
+      }
+      set('coverage',num(item.bars.length)+' bars · '+stamp(first)+' → '+stamp(last)+' UTC');
+      if(defaults)centerRange();else updatePreview();
+      showStatus((result?'Data ready — press Run backtest to use these inputs.':'Data ready. Configure the grid or run the default setup.')+(item.invalid?' '+num(item.invalid)+' invalid observations excluded.':''),!!result);
+      loadBusy=false;updateButtons();if(autoRun)await run();
+    }catch(error){
+      if(id!==loadId)return;dataset=null;loadedGranularity=null;loadBusy=false;updateButtons();set('coverage','Price data unavailable.');
+      showError((error.name==='AbortError'?'The price request timed out.':error.message)+' Check your internet connection, then use Reload data.');showStatus('Waiting for valid BTC data.');
+    }
+  }
+  function validate(){
+    $('error').hidden=true;for(const input of document.querySelectorAll('[aria-invalid]'))input.removeAttribute('aria-invalid');
+    if(!dataset||loadedGranularity!==$('granularity').value)throw new Error('Wait for the selected price file to finish loading.');
+    for(const id of ['start-date','end-date','initial-balance','bottom','top','num-grids','fee',...($('tp-enabled').checked?['tp']:[]),...($('sl-enabled').checked?['sl']:[])]){
+      const el=$(id);if(!el.value||!el.checkValidity()){el.setAttribute('aria-invalid','true');el.focus();throw new Error('Check '+(el.labels?.[0]?.textContent||el.getAttribute('aria-label')||id).trim()+'. Use a value within its displayed limits.');}
+    }
+    const start=inputTime('start-date'),end=inputTime('end-date',true);if(!Number.isFinite(start)||!Number.isFinite(end)||start>end)throw new Error('The start must not be after the end date.');
+    const bars=selectedBars();if(bars.length<2)throw new Error('Select at least two observed price bars.');
+    const cfg=readConfig();GridEngine.generateLevels(cfg.bottom,cfg.top,cfg.numGrids,cfg.spacing);
+    if(cfg.tp!=null&&cfg.sl!=null&&cfg.tp<=cfg.sl)throw new Error('Take profit must be above stop loss.');
+    return {bars,cfg};
+  }
+  function stopWorker(){if(worker){worker.terminate();worker=null;}if(workerURL){URL.revokeObjectURL(workerURL);workerURL=null;}}
+  function compute(bars,cfg){
+    return new Promise((resolve,reject)=>{
+      try{
+        workerURL=URL.createObjectURL(new Blob([$('grid-engine').textContent,'\nself.onmessage=e=>{try{const r=GridEngine.simulate(e.data.bars,e.data.cfg,p=>self.postMessage({progress:p}));self.postMessage({result:r});}catch(error){self.postMessage({error:error.message});}};'],{type:'text/javascript'}));
+        worker=new Worker(workerURL);
+        worker.onmessage=e=>{if(e.data.progress!=null)$('progress-bar').style.width=(e.data.progress*100)+'%';else if(e.data.error){stopWorker();reject(new Error(e.data.error));}else{stopWorker();resolve(e.data.result);}};
+        worker.onerror=()=>{stopWorker();reject(new Error('The simulation worker failed. Reload this page and retry a shorter date range.'));};
+        worker.postMessage({bars,cfg});
+      }catch{
+        stopWorker();setTimeout(()=>{try{resolve(GridEngine.simulate(bars,cfg));}catch(error){reject(error);}},25);
+      }
+    });
+  }
+  async function digest(bars){try{if(!window.crypto?.subtle)return null;const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(bars)));return [...new Uint8Array(hash)].map(x=>x.toString(16).padStart(2,'0')).join('');}catch{return null;}}
+  async function run(){
+    if(busy||loadBusy)return;let input;try{input=validate();}catch(error){showError(error.message);return;}
+    busy=true;updateButtons();$('run').textContent='Running…';$('progress').hidden=false;$('progress-bar').style.width='0%';showStatus('Simulating '+num(input.bars.length)+' observed closes…');
+    const started=performance.now(),currentLoad=loadId;
+    try{
+      const [computed,hash]=await Promise.all([compute(input.bars,input.cfg),digest(input.bars)]);
+      if(currentLoad!==loadId)return;
+      computed.dataInfo={url:ROOT+FILES[input.cfg.granularity],fetchedAt:loadTime,fullCount:dataset.bars.length,first:iso(dataset.bars[0].t),last:iso(dataset.bars.at(-1).t),invalid:dataset.invalid,duplicates:dataset.duplicates,selectedCount:input.bars.length,selectedSHA256:hash};
+      computed.requestedPeriod={start:$('start-date').value,end:$('end-date').value};computed.ranAt=new Date().toISOString();result=computed;dirty=false;page=0;
+      renderResults();renderLog();showStatus('Backtest complete · '+num(result.rows.length)+' bars · '+num(result.trades.length)+' fills · '+((performance.now()-started)/1000).toFixed(2)+'s');
+      $('export-trades').disabled=false;$('export-config').disabled=false;
+    }catch(error){showError(error.message);showStatus(result?'Run failed. Previous results are still displayed.':'Run failed. Check the configuration.',true);}
+    finally{if(currentLoad===loadId){busy=false;$('run').textContent='▶ Run backtest';$('progress').hidden=true;updateButtons();}}
+  }
+  function renderResults(){
+    const r=result,s=r.stats; $('results').hidden=false;$('empty').hidden=true;
+    set('roi',pct(s.roi));tone('roi',s.roi);set('buy-hold',pct(s.buyHold));tone('buy-hold',s.buyHold);
+    set('edge',(s.roi-s.buyHold>=0?'+':'')+(s.roi-s.buyHold).toFixed(2)+' pp vs. buy & hold');tone('edge',s.roi-s.buyHold);
+    set('max-dd',s.maxDD.toFixed(2)+'%');set('max-runup',pct(s.maxRunup));set('sharpe',s.sharpe==null?'N/A':s.sharpe.toFixed(2));set('sortino',s.sortino==null?'N/A':s.sortino.toFixed(2));
+    set('fees',money(s.totalFees));set('fees-sub',(s.totalFees/r.config.initialBalance*100).toFixed(3)+'% of starting capital');
+    set('trades-count',num(s.buys)+' / '+num(s.sells));set('trades-sub',num(r.trades.filter(t=>t.kind==='grid').length)+' grid fills · '+num(r.trades.filter(t=>t.kind!=='grid').length)+' market fills');
+    set('final-equity',money(s.equity));set('final-fiat',money(s.fiat));set('final-crypto',btcFmt(s.btc)+' BTC');set('final-pnl',money(s.pnl));tone('final-pnl',s.pnl);
+    set('result-period',' / '+iso(r.rows[0].t).slice(0,10)+' → '+iso(r.rows.at(-1).t).slice(0,10)+' · '+r.config.granularity.toUpperCase());
+    set('run-state',r.exit?'■ '+r.exit.reason.toUpperCase():r.activation?'● COMPLETED':'○ NEVER ACTIVATED');
+    set('price-foot',r.config.numGrids+' levels · center '+money(r.center)+' · '+(r.activation?btcFmt(r.qty)+' BTC / order':'waiting for an in-range close'));
+    set('equity-foot','Realized '+money(s.realized)+' · Unrealized '+money(s.unrealized)+' · Final BTC valued at '+money(r.rows.at(-1).p));set('dd-label','Max −'+s.maxDD.toFixed(2)+'%');
+    const notes=[];
+    if(!r.activation)notes.push('No observed close entered the range. No seed purchase or grid fills; capital stayed in fiat.');
+    else if(r.activation.index>0)notes.push('Activated at '+stamp(r.activation.t)+' UTC; '+r.activation.index+' earlier bars stayed in fiat.');
+    if(r.exit)notes.push(r.exit.reason+' at '+money(r.exit.price)+' on '+stamp(r.exit.t)+' UTC. All orders canceled; equity stays in fiat to the selected end.');
+    if(r.skipped)notes.push(num(r.skipped)+' unfunded crossing events skipped; '+r.unfundedOrders+' orders remain unfunded. No borrowing or partial fills.');
+    if(r.missing)notes.push(num(r.missing)+' nominal intervals missing. Crossings span the gaps; annualized ratios assume '+r.config.granularity+' bars.');
+    if(r.dataInfo.invalid||r.dataInfo.duplicates)notes.push(r.dataInfo.invalid+' invalid records excluded; '+r.dataInfo.duplicates+' duplicate UTC timestamps merged.');
+    if(r.stats.ratioFallback)notes.push('Low/zero deviation: one or both ratios use the analyzer’s fallback convention (see Methodology).');
+    if(r.rows.length<30)notes.push('Only '+r.rows.length+' observations: annualized ratios are sensitive to this short window.');
+    if(r.levels.some((p,i)=>i&&r.levels[i]-r.levels[i-1]<=r.config.feeRate*(r.levels[i]+r.levels[i-1])))notes.push('At least one adjacent round trip has a gross spread no larger than its two trading fees.');
+    $('run-notes').hidden=!notes.length;set('run-notes',notes.join(' '));renderCharts();
+  }
+  function palette(){const style=getComputedStyle(document.documentElement);return Object.fromEntries(['text','muted','border','surface','surface2','accent','green','red','amber','bg'].map(k=>[k,style.getPropertyValue('--'+k).trim()]));}
+  // Extrema-preserving reduction is only for line rendering; engine rows are untouched.
+  function sampleRows(rows,budget=2400){
+    if(rows.length<=budget)return rows;const keep=new Set([0,rows.length-1]),keys=['p','equity','buyHold','dd'],buckets=Math.max(1,Math.floor(budget/(keys.length*2)));
+    for(let b=0;b<buckets;b++){
+      const start=Math.floor(b*rows.length/buckets),end=Math.floor((b+1)*rows.length/buckets);
+      for(const key of keys){let low=start,high=start;for(let i=start+1;i<end;i++){if(rows[i][key]<rows[low][key])low=i;if(rows[i][key]>rows[high][key])high=i;}keep.add(low);keep.add(high);}
+    }
+    return [...keep].sort((a,b)=>a-b).map(i=>rows[i]);
+  }
+  function destroyCharts(){for(const chart of charts)chart.destroy();charts=[];}
+  function renderCharts(){
+    if(!result)return;destroyCharts();$('chart-error').hidden=true;
+    if(typeof Chart==='undefined'){set('chart-error','Charts could not load from cdnjs. Statistics and the trade log are available. Check your connection and reload the page.');$('chart-error').hidden=false;return;}
+    let hasAnnotation=true;try{Chart.registry.getPlugin('annotation');}catch{hasAnnotation=false;}
+    if(!hasAnnotation){set('chart-error','Grid annotations could not load from jsDelivr. Reload to restore grid lines. Price, equity, drawdown and fill markers are still available.');$('chart-error').hidden=false;}
+    const C=palette(),r=result,end=r.rows.at(-1).t,windowValue=$('chart-window').value,start=windowValue==='all'?r.rows[0].t:Math.max(r.rows[0].t,end-Number(windowValue)*GridEngine.DAY);
+    const visible=r.rows.filter(d=>d.t>=start),sampled=sampleRows(visible),range=end-start,points=key=>sampled.map(d=>({x:d.t,y:d[key]}));
+    const base=()=>({responsive:true,maintainAspectRatio:false,animation:false,parsing:false,interaction:{mode:'nearest',axis:'xy',intersect:false},layout:{padding:{top:12,right:6}},elements:{line:{tension:0,borderWidth:1.6},point:{radius:0}},plugins:{legend:{display:false},tooltip:{backgroundColor:C.surface2,titleColor:C.text,bodyColor:C.text,borderColor:C.border,borderWidth:1,padding:10,displayColors:true,callbacks:{title:items=>items.length?stamp(items[0].parsed.x)+' UTC':'',label:item=>item.dataset.label+': '+money(item.parsed.y)}}},scales:{x:{type:'linear',min:start,max:end,grid:{display:false},border:{display:false},ticks:{color:C.muted,maxTicksLimit:7,font:{size:10,family:'monospace'},callback:value=>{const d=new Date(value);return range<=3*GridEngine.DAY?iso(+d).slice(5,16).replace('T',' '):new Intl.DateTimeFormat('en-US',{month:'short',day:'numeric',...(range>365*GridEngine.DAY?{year:'2-digit'}:{}),timeZone:'UTC'}).format(d);}}},y:{position:'right',border:{display:false},grid:{color:C.border+'66'},ticks:{color:C.muted,font:{size:10,family:'monospace'},maxTicksLimit:6,callback:value=>Math.abs(value)>=1000?'$'+(value/1000).toLocaleString('en-US',{maximumFractionDigits:1})+'k':'$'+Number(value).toLocaleString('en-US',{maximumFractionDigits:2})}}}});
+    const annotations={};r.levels.forEach((p,i)=>{annotations['grid'+i]={type:'line',yMin:p,yMax:p,borderColor:(p<=r.center?C.green:C.red)+'50',borderWidth:1,drawTime:'beforeDatasetsDraw',label:{display:i===0||i===r.levels.length-1,content:(i===0?'Bottom ':'Top ')+money(p),position:'start',backgroundColor:C.surface,color:C.muted,font:{size:9},padding:3}};});
+    annotations.center={type:'line',yMin:r.center,yMax:r.center,borderColor:C.accent,borderWidth:1,borderDash:[5,5],drawTime:'beforeDatasetsDraw',label:{display:true,content:'Center '+money(r.center),position:'end',backgroundColor:C.surface,color:C.accent,font:{size:9},padding:3}};
+    for(const [key,label] of [['tp','TP'],['sl','SL']])if(r.config[key]!=null)annotations[key]={type:'line',yMin:r.config[key],yMax:r.config[key],borderColor:C.amber,borderDash:[3,5],borderWidth:1,label:{display:true,content:label+' '+money(r.config[key]),position:'start',backgroundColor:C.surface,color:C.amber,font:{size:9}}};
+    const fills=r.trades.filter(t=>t.t>=start),markers=side=>fills.filter(t=>t.side===side).map(t=>({x:t.t,y:t.price,trade:t})),priceOptions=base();priceOptions.plugins.annotation={annotations};
+    priceOptions.plugins.tooltip.callbacks.label=item=>{const t=item.raw.trade;return t?[t.side.toUpperCase()+' · '+(t.kind==='grid'?'L'+t.level+' / cycle '+t.cycle:t.kind),money(t.price)+' × '+btcFmt(t.qty)+' BTC','Fee '+money(t.fee)+' · P&L '+money(t.pnl)]:item.dataset.label+': '+money(item.parsed.y);};
+    try{
+      charts.push(new Chart($('price-chart'),{type:'line',data:{datasets:[{label:'BTC close',data:points('p'),borderColor:C.amber,order:2},{type:'scatter',label:'Buy',data:markers('buy'),pointStyle:'triangle',pointRadius:fills.length>3000?3:5,pointHoverRadius:7,pointBackgroundColor:C.green,pointBorderColor:C.bg,pointBorderWidth:1,order:0},{type:'scatter',label:'Sell',data:markers('sell'),pointStyle:'triangle',pointRotation:180,pointRadius:fills.length>3000?3:5,pointHoverRadius:7,pointBackgroundColor:C.red,pointBorderColor:C.bg,pointBorderWidth:1,order:0}]},options:priceOptions}));
+      const equityOptions=base();equityOptions.interaction={mode:'index',intersect:false};charts.push(new Chart($('equity-chart'),{type:'line',data:{datasets:[{label:'Grid equity',data:points('equity'),borderColor:C.accent,backgroundColor:C.accent+'13',fill:'origin',order:0},{label:'Buy & hold',data:points('buyHold'),borderColor:C.amber+'a0',borderDash:[5,4],borderWidth:1.2,order:1}]},options:equityOptions}));
+      const ddOptions=base();ddOptions.scales.y.max=0;ddOptions.scales.y.suggestedMin=-.1;ddOptions.scales.y.ticks.callback=v=>v.toFixed(1)+'%';ddOptions.plugins.tooltip.callbacks.label=i=>'Drawdown: '+i.parsed.y.toFixed(3)+'%';charts.push(new Chart($('dd-chart'),{type:'line',data:{datasets:[{label:'Drawdown',data:points('dd'),borderColor:C.red,backgroundColor:C.red+'28',fill:'origin',borderWidth:1.3}]},options:ddOptions}));
+    }catch(error){set('chart-error','Chart rendering failed: '+error.message);$('chart-error').hidden=false;}
+  }
+  function filteredTrades(){if(!result)return [];const filter=$('side-filter').value;return result.trades.filter(t=>filter==='all'||t.side===filter||(filter==='grid'&&t.kind==='grid')||(filter==='market'&&t.kind!=='grid'));}
+  function renderLog(){
+    const all=filteredTrades(),pages=Math.max(1,Math.ceil(all.length/50));page=Math.min(page,pages-1);const subset=all.slice(page*50,page*50+50),body=$('trade-body');body.replaceChildren();
+    if(!subset.length){const tr=document.createElement('tr'),td=document.createElement('td');td.colSpan=8;td.textContent=result?'No fills match this filter.':'Run a backtest to inspect fills.';tr.append(td);body.append(tr);}
+    for(const t of subset){const tr=document.createElement('tr'),cells=[t.side.toUpperCase(),stamp(t.t),money(t.price),btcFmt(t.qty),t.kind==='grid'?'L'+t.level+' / C'+t.cycle:t.kind,money(t.fee),money(t.pnl),money(t.realized)];cells.forEach((value,i)=>{const td=document.createElement('td');td.textContent=value;if(i===0)td.className='side-pill '+(t.side==='buy'?'positive':'negative');if(i===6||i===7)td.className=(i===6?t.pnl:t.realized)>=0?'positive':'negative';tr.append(td);});body.append(tr);}
+    set('page-info','Page '+(page+1)+' of '+pages);set('log-count',num(all.length)+' matching fills');$('prev-page').disabled=page===0;$('next-page').disabled=page>=pages-1;
+    if(result)set('log-meta',num(result.trades.length)+' fills · '+result.config.granularity.toUpperCase()+' · '+stamp(result.rows[0].t)+' → '+stamp(result.rows.at(-1).t)+' UTC');
+  }
+  function switchView(view){
+    for(const panel of document.querySelectorAll('.panel'))panel.classList.toggle('active',panel.id==='panel-'+view);
+    for(const tab of document.querySelectorAll('.tab')){const active=tab.dataset.view===view;tab.classList.toggle('active',active);if(active)tab.setAttribute('aria-current','page');else tab.removeAttribute('aria-current');}
+    $('mobile-view').value=view;if(view==='backtest')requestAnimationFrame(()=>charts.forEach(c=>c.resize()));
+  }
+  function download(name,text,type){const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}
+  function exportConfig(){
+    if(!result)return;const r=result,c=r.config;
+    const output={sandbox_version:'1.0',ran_at:r.ranAt,config:{exchange:{name:'historical_close_data',trading_fee:c.feeRate,trading_mode:'backtest'},pair:{base_currency:'BTC',quote_currency:'USD'},trading_settings:{timeframe:c.granularity,period:{start_date:iso(r.rows[0].t),end_date:iso(r.rows.at(-1).t)},initial_balance:c.initialBalance},grid_strategy:{type:'simple_grid',spacing:c.spacing,num_grids:c.numGrids,range:{top:c.top,bottom:c.bottom},buy_ratio:1,sell_ratio:1},risk_management:{take_profit:{enabled:c.tp!=null,threshold:c.tp},stop_loss:{enabled:c.sl!=null,threshold:c.sl}}},requested_period:r.requestedPeriod,data:r.dataInfo,assumptions:{fills:'Directional crossings between observed closes, at grid prices; no OHLCV, slippage or liquidity modeling.',central_price:'Arithmetic midpoint for both spacing types',init:'First close in range; 50% BTC notional plus fee',pairing:'Independent adjacent cycles',fixed_quantity_btc:r.qty,risk_exit:'At observed close after grid fills; remain in fiat to selected end',end_of_test:'Mark remaining BTC to last close; no forced sale',risk_free_rate:0.03,annual_periods:365*GridEngine.DAY/GridEngine.INTERVALS[c.granularity],sortino:'Sample SD of negative excess returns, upstream fallback convention',buy_hold:'Gross price return without fees'},stats:r.stats,activation:r.activation,exit:r.exit,missing_intervals:r.missing,skipped_unfunded_crossings:r.skipped,open_orders:r.openOrders,unfunded_orders:r.unfundedOrders,reserved_fiat:r.reservedFiat,reserved_btc:r.reservedBTC,levels:r.levels};
+    download('btc-grid-run.json',JSON.stringify(output,null,2),'application/json');
+  }
+  function exportTrades(){if(!result)return;const rows=[['side','timestamp_utc','price_usd','quantity_btc','grid_level','cycle','kind','fee_usd','running_pnl_usd','cumulative_realized_pnl_usd','fiat_balance_usd','btc_balance'],...result.trades.map(t=>[t.side,iso(t.t),t.price,t.qty,t.level??'',t.cycle??'',t.kind,t.fee,t.pnl,t.realized,t.fiat,t.btc])];download('btc-grid-trades.csv',rows.map(row=>row.join(',')).join('\r\n'),'text/csv;charset=utf-8');}
+  async function reset(){
+    ++loadId;stopWorker();if(fetchController)fetchController.abort();busy=false;loadBusy=false;result=null;dirty=false;page=0;destroyCharts();$('config-form').reset();$('granularity').value='4h';$('tp').disabled=true;$('sl').disabled=true;$('run').textContent='▶ Run backtest';$('progress').hidden=true;$('results').hidden=true;$('empty').hidden=false;$('error').hidden=true;$('configuration').open=true;$('chart-window').value='all';$('side-filter').value='all';$('export-trades').disabled=true;$('export-config').disabled=true;set('log-meta','Run a backtest to inspect fills.');renderLog();switchView('backtest');await loadData({resetDates:true,defaults:true,autoRun:true});
+  }
+  function init(){
+    try{if(localStorage.getItem('btc-grid-theme')==='light')document.documentElement.dataset.theme='light';}catch{}
+    set('theme-toggle',document.documentElement.dataset.theme==='light'?'Dark mode':'Light mode');
+    $('theme-toggle').addEventListener('click',()=>{const light=document.documentElement.dataset.theme!=='light';document.documentElement.dataset.theme=light?'light':'dark';set('theme-toggle',light?'Dark mode':'Light mode');try{localStorage.setItem('btc-grid-theme',light?'light':'dark');}catch{}renderCharts();});
+    $('nav-toggle').addEventListener('click',()=>{document.body.classList.toggle('nav-collapsed');$('nav-toggle').setAttribute('aria-expanded',String(!document.body.classList.contains('nav-collapsed')));});
+    for(const tab of document.querySelectorAll('[data-view]'))tab.addEventListener('click',()=>switchView(tab.dataset.view));$('mobile-view').addEventListener('change',e=>switchView(e.target.value));
+    $('config-form').addEventListener('submit',e=>{e.preventDefault();run();});$('config-form').addEventListener('input',markDirty);
+    $('granularity').addEventListener('change',()=>{dirty=!!result;loadData();});$('retry').addEventListener('click',()=>loadData({reload:true}));
+    for(const button of document.querySelectorAll('[data-period]'))button.addEventListener('click',()=>setPeriod(button.dataset.period));
+    for(const side of ['tp','sl'])$(side+'-enabled').addEventListener('change',()=>{$(side).disabled=!$(side+'-enabled').checked;markDirty();});
+    $('center-range').addEventListener('click',centerRange);$('reset').addEventListener('click',reset);$('chart-window').addEventListener('change',renderCharts);
+    $('side-filter').addEventListener('change',()=>{page=0;renderLog();});$('prev-page').addEventListener('click',()=>{page--;renderLog();});$('next-page').addEventListener('click',()=>{page++;renderLog();});
+    $('export-trades').addEventListener('click',exportTrades);$('export-config').addEventListener('click',exportConfig);
+    loadData({resetDates:true,defaults:true,autoRun:true});
+  }
+  document.addEventListener('DOMContentLoaded',init,{once:true});
+})();
+</script>
+</body>
+</html>

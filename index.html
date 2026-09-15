@@ -23,6 +23,7 @@
 @media(max-width:1100px){.window-body{grid-template-columns:174px minmax(0,1fr)}.hero-stats .stat-val{font-size:31px}.metric-strip{grid-template-columns:repeat(2,minmax(0,1fr));gap:17px 0}.metric-strip>div:nth-child(2){border:0}.preview-box{flex-wrap:wrap;gap:10px}.quant-report{grid-template-columns:1fr}.quant-note:first-child{grid-column:auto}.scorecard{grid-template-columns:1fr}.header-actions .primary{min-width:118px}.header-actions button{font-size:11px}}
 @media(max-width:800px){.window-body{display:block}.header{align-items:flex-start;flex-wrap:wrap;gap:14px}.header-actions{justify-content:flex-start;flex-wrap:nowrap}.config-card summary>span:last-of-type{display:none}.content{padding:18px 14px}.hero-stats .stat{padding:14px 13px 9px}.hero-stats .stat-val{font-size:29px}.quant-snapshot{padding:15px;gap:13px}.snapshot-symbol{display:none}.run-heading .chart-tools{width:100%;justify-content:flex-start}.chart-wrap.overview-equity{height:230px}.chart-wrap.medium{height:220px}.panel-heading h2{font-size:23px}.chart-card{padding:16px 14px}.config-body{padding:15px}.config-footer{align-items:flex-start}.config-footer>.actions{align-self:flex-end}.heatmap-scroll{max-height:440px}.metric-strip small{font-size:9px}}
 @media(max-width:480px){.hero-stats .stat-val{font-size:26px}.hero-stats .stat-label{font-size:8px;min-height:26px}.hero-stats .stat-sub{min-height:30px}.hero-stats .spark{height:25px;margin-top:6px}.spark svg{height:25px}.g4{gap:9px}.header-actions{width:100%}.header-actions button{flex:1}.metric-strip strong{font-size:21px}.quant-snapshot h2{font-size:14px}.run-badge{font-size:8px}.run-heading #result-period{font-size:10px}.preview-box{padding:12px}.preview-box #grid-preview{width:100%}.chart-wrap{height:290px}.chart-wrap.medium{height:220px}.chart-wrap.underwater{height:155px}.toolbar-actions{flex-wrap:wrap}.toolbar-actions button{flex:1 1 100px}.quant-note{padding:17px}.scorecard-row strong{white-space:normal}.config-footer>.actions{width:100%}.config-footer>.actions .primary{flex:1}.config-footer button{font-size:12px}.heatmap button{font-size:10px}}
+.adaptive-card{margin:4px 0 18px;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:5px;background:linear-gradient(120deg,color-mix(in srgb,var(--accent) 5%,var(--surface)),var(--surface));padding:16px}.adaptive-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}.adaptive-head h3{font-size:15px;margin:0}.adaptive-head p{font-size:11px;color:var(--muted);margin:3px 0 0}.adaptive-toggle{display:flex;min-width:240px;border:1px solid var(--border);border-radius:4px;overflow:hidden}.adaptive-toggle label{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;min-height:38px;background:var(--bg);font-size:11px;cursor:pointer}.adaptive-toggle label+label{border-left:1px solid var(--border)}.adaptive-toggle label:has(input:checked){color:var(--accent);background:var(--faint)}.adaptive-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:14px}.adaptive-metric{padding:10px;border:1px solid var(--border);border-radius:4px;background:var(--bg);min-width:0}.adaptive-metric span{display:block;color:var(--muted);font:9px ui-monospace,monospace;letter-spacing:.05em;text-transform:uppercase}.adaptive-metric strong{display:block;margin-top:3px;font:600 14px ui-monospace,monospace;overflow-wrap:anywhere}.adaptive-reason{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}.adaptive-reason p{margin:0;color:var(--muted);font-size:11px;line-height:1.55}.adaptive-reason button{flex:0 0 auto}.adaptive-card[data-state=manual] .adaptive-grid,.adaptive-card[data-state=manual] .adaptive-reason{opacity:.55}.adaptive-card[data-state=manual] #apply-adaptive{display:none}@media(max-width:1100px){.adaptive-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:700px){.adaptive-head{flex-direction:column}.adaptive-toggle{width:100%;min-width:0}.adaptive-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.adaptive-reason{align-items:stretch;flex-direction:column}.adaptive-reason button{width:100%}}@media(max-width:420px){.adaptive-grid{grid-template-columns:1fr}.adaptive-metric{display:flex;align-items:center;justify-content:space-between;gap:10px}.adaptive-metric strong{margin:0;text-align:right}}
 
 </style>
 </head>
@@ -57,7 +58,12 @@
             <div class="field"><label for="initial-balance">Investment · USD</label><input id="initial-balance" type="number" min="0.01" max="1000000000000" step="any" value="10000" required></div>
           </div>
           <div class="config-meta"><span id="coverage">Fetching BTC data…</span><span><button type="button" class="text-btn" data-period="30">30D</button><button type="button" class="text-btn" data-period="90">90D</button><button type="button" class="text-btn" data-period="365">1Y</button><button type="button" class="text-btn" data-period="all">All</button><button type="button" class="text-btn" id="retry">↻ Reload</button></span></div>
-          <div class="section-label">02 / Grid construction</div>
+          <section class="adaptive-card" id="adaptive-card" data-state="manual" aria-labelledby="adaptive-title">
+            <div class="adaptive-head"><div><div class="section-label">02 / Adaptive quant setup</div><h3 id="adaptive-title">Let the regime shape the grid</h3><p>Uses only price and MVRV observations available at the start of the selected test. No future bars enter the recommendation.</p></div><div class="adaptive-toggle" role="radiogroup" aria-label="Grid setup mode"><label><input type="radio" name="setup-mode" value="manual" checked>Manual</label><label><input type="radio" name="setup-mode" value="adaptive">Adaptive</label></div></div>
+            <div class="adaptive-grid" aria-live="polite"><div class="adaptive-metric"><span>Regime</span><strong id="adaptive-regime">Manual</strong></div><div class="adaptive-metric"><span>Grid suitability</span><strong id="adaptive-score">—</strong></div><div class="adaptive-metric"><span>MVRV / Z</span><strong id="adaptive-mvrv">Loading…</strong></div><div class="adaptive-metric"><span>30D / 90D ROC</span><strong id="adaptive-roc">—</strong></div><div class="adaptive-metric"><span>Annualized vol</span><strong id="adaptive-vol">—</strong></div></div>
+            <div class="adaptive-reason"><p id="adaptive-reason">Switch to Adaptive to calculate a volatility-sized, regime-biased range and a fee-aware grid target.</p><button type="button" class="primary" id="apply-adaptive">Apply recommendation</button></div>
+          </section>
+          <div class="section-label">03 / Grid construction</div>
           <div class="form-grid">
             <div class="field"><label for="strategy">Execution model</label><select id="strategy"><option value="binance">Binance-style spot</option><option value="legacy">Original simple grid · v1</option></select></div>
             <div class="field"><label for="num-grids" id="grids-label">Grids · intervals</label><input id="num-grids" type="number" min="2" max="170" step="1" value="20" required></div>
@@ -398,7 +404,7 @@ var GridEngine = (() => {
   let activeView='backtest';
   const $=id=>document.getElementById(id),ROOT='https://raw.githubusercontent.com/0xtrvkc/dynamic-btc-analytics-dashboard/main/';
   const FILES={'1d':'btc_daily_price.json','4h':'btc_4h_price.json','1h':'btc_1h_price.json'},cache=new Map();
-  let dataset=null,loadedGranularity=null,result=null,charts=[],worker=null,workerURL=null,fetchController=null,loadId=0,busy=false,loadBusy=false,dirty=false,page=0,loadTime=null;
+  let dataset=null,loadedGranularity=null,mvrvData=null,mvrvError=null,adaptiveRecommendation=null,result=null,charts=[],worker=null,workerURL=null,fetchController=null,loadId=0,busy=false,loadBusy=false,dirty=false,page=0,loadTime=null;
   const usd=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}),int=new Intl.NumberFormat('en-US');
   const money=v=>v==null||!Number.isFinite(v)?'N/A':usd.format(v),pct=(v,signed=true)=>v==null||!Number.isFinite(v)?'N/A':(v>0&&signed?'+':'')+(Math.abs(v)>1e7?v.toExponential(2):v.toFixed(2))+'%',num=v=>int.format(v),iso=t=>new Date(t).toISOString(),stamp=t=>iso(t).slice(0,16).replace('T',' ');
   const btcFmt=v=>v.toLocaleString('en-US',{minimumFractionDigits:8,maximumFractionDigits:8}),set=(id,v)=>$(id).textContent=v;
@@ -423,6 +429,57 @@ var GridEngine = (() => {
   function centerRange(){
     const b=selectedBars()[0];if(!b)return;const precision=Math.max(0,4-Math.floor(Math.log10(b.p)));
     for(const [id,m] of [['bottom',.8],['top',1.2],['tp',1.25],['sl',.75],['trigger',1]])$(id).value=(b.p*m).toFixed(precision);markDirty();
+  }
+
+  async function loadMvrvData(reload=false){
+    try{
+      const response=await fetch(ROOT+'mvrv.json',{cache:reload?'reload':'default'});if(!response.ok)throw new Error('HTTP '+response.status);
+      const raw=await response.json(),rows=Array.isArray(raw)?raw:(raw.mvrv||[]);
+      mvrvData=rows.map(row=>({t:Number(row.x??Date.parse(row.date)),v:Number(row.y??row.mvrv??row.value)})).filter(row=>Number.isFinite(row.t)&&Number.isFinite(row.v)&&row.v>0).sort((a,b)=>a.t-b.t);
+      if(!mvrvData.length)throw new Error('No valid observations');mvrvError=null;
+    }catch(error){mvrvData=null;mvrvError=error.message||'Unavailable';}
+    updateAdaptivePreview();
+  }
+
+  const clamp=(v,lo,hi)=>Math.max(lo,Math.min(hi,v));
+  const average=a=>a.length?a.reduce((s,v)=>s+v,0)/a.length:NaN;
+  const sampleSD=a=>{if(a.length<2)return NaN;const m=average(a);return Math.sqrt(a.reduce((s,v)=>s+(v-m)**2,0)/(a.length-1));};
+  function priceAtOrBefore(bars,t){let lo=0,hi=bars.length-1,best=null;while(lo<=hi){const mid=(lo+hi)>>1;if(bars[mid].t<=t){best=bars[mid];lo=mid+1;}else hi=mid-1;}return best;}
+  function adaptiveSetup(){
+    if(!dataset)throw new Error('Price data is still loading.');
+    const start=inputTime('start-date'),entry=priceAtOrBefore(dataset.bars,start);if(!entry)throw new Error('No price history exists before this start date.');
+    const history=dataset.bars.filter(row=>row.t<=entry.t),yearMs=365*GridEngine.DAY;
+    const returns=[];for(let i=1;i<history.length;i++){if(history[i].t>=entry.t-90*GridEngine.DAY)returns.push(Math.log(history[i].p/history[i-1].p));}
+    if(returns.length<20)throw new Error('Adaptive setup needs at least 20 prior price observations.');
+    const interval=GridEngine.INTERVALS[$('granularity').value],annualVol=sampleSD(returns)*Math.sqrt(yearMs/interval),horizonMove=clamp(annualVol*Math.sqrt(30/365),.08,.35);
+    const p30=priceAtOrBefore(history,entry.t-30*GridEngine.DAY),p90=priceAtOrBefore(history,entry.t-90*GridEngine.DAY),roc30=p30?(entry.p/p30.p-1)*100:null,roc90=p90?(entry.p/p90.p-1)*100:null;
+    const recent=history.filter(row=>row.t>=entry.t-30*GridEngine.DAY),path=recent.slice(1).reduce((s,row,i)=>s+Math.abs(row.p-recent[i].p),0),efficiency=path?Math.abs(entry.p-recent[0].p)/path:1;
+    const eligible=mvrvData?.filter(row=>row.t<=entry.t)||[],current=eligible.at(-1)||null,window=current?eligible.filter(row=>row.t>=current.t-365*GridEngine.DAY):[],mMean=average(window.map(row=>row.v)),mSD=sampleSD(window.map(row=>row.v)),z=current&&Number.isFinite(mSD)&&mSD>0?(current.v-mMean)/mSD:null;
+    let regime='Neutral / range',down=1,up=1,reserve=10;
+    const bullish=(roc30??0)>6&&(roc90??0)>10,bearish=(roc30??0)<-6&&(roc90??0)<-10;
+    if(current&&current.v<1.15||z!=null&&z<-1){regime='Accumulation';down=1.35;up=.8;reserve=1;}
+    else if(current&&current.v>2.6||z!=null&&z>1.25){regime='Distribution';down=.75;up=1.1;reserve=25;}
+    else if(bullish){regime='Bull trend';down=.8;up=1.35;reserve=5;}
+    else if(bearish){regime='Bear trend';down=1.35;up=.65;reserve=20;}
+    const score=Math.round(clamp(100-Math.min(50,Math.abs(roc30??0)*1.8)-Math.min(35,efficiency*70),0,100));
+    const gate=score>=65?'GRID ON':score>=40?'REDUCED / CAUTION':'PAUSE CANDIDATE';
+    const lower=entry.p*(1-horizonMove*down),upper=entry.p*(1+horizonMove*up),barVol=sampleSD(returns)*100,target=clamp(barVol*.55,.35,2.5);
+    return {asOf:entry.t,price:entry.p,annualVol:annualVol*100,roc30,roc90,efficiency,mvrv:current?.v??null,z,regime,score,gate,lower,upper,target,reserve};
+  }
+
+  function updateAdaptivePreview(){
+    const adaptive=document.querySelector('input[name=setup-mode]:checked')?.value==='adaptive';$('adaptive-card').dataset.state=adaptive?'adaptive':'manual';
+    if(!adaptive){set('adaptive-regime','Manual');set('adaptive-score','—');set('adaptive-roc','—');set('adaptive-vol','—');set('adaptive-mvrv',mvrvError?'Unavailable':mvrvData?'Ready':'Loading…');set('adaptive-reason','Switch to Adaptive to calculate a volatility-sized, regime-biased range and a fee-aware grid target.');return;}
+    try{
+      const r=adaptiveRecommendation=adaptiveSetup();set('adaptive-regime',r.regime);set('adaptive-score',r.score+'/100 · '+r.gate);set('adaptive-mvrv',r.mvrv==null?'Unavailable':r.mvrv.toFixed(3)+' / '+(r.z==null?'Z N/A':r.z.toFixed(2)));set('adaptive-roc',(r.roc30==null?'N/A':r.roc30.toFixed(1)+'%')+' / '+(r.roc90==null?'N/A':r.roc90.toFixed(1)+'%'));set('adaptive-vol',r.annualVol.toFixed(1)+'%');
+      set('adaptive-reason','As of '+stamp(r.asOf)+' UTC: '+r.gate+'. Proposed '+money(r.lower)+' – '+money(r.upper)+', '+r.target.toFixed(2)+'% target net/grid and '+r.reserve.toFixed(0)+'% cash buffer. MVRV changes bias; trailing volatility sizes the range.');
+    }catch(error){adaptiveRecommendation=null;set('adaptive-regime','Waiting');set('adaptive-score','—');set('adaptive-roc','—');set('adaptive-vol','—');set('adaptive-mvrv',mvrvError?'Unavailable':mvrvData?'Ready':'Loading…');set('adaptive-reason',error.message);}
+  }
+
+  function applyAdaptive(){
+    updateAdaptivePreview();const r=adaptiveRecommendation;if(!r)return;
+    $('bottom').value=r.lower.toFixed(2);$('top').value=r.upper.toFixed(2);$('reserve').value=r.reserve.toFixed(1);$('target-profit-grid').value=r.target.toFixed(2);document.querySelector('input[name=spacing][value=geometric]').checked=true;syncGridsToProfitTarget();markDirty();
+    showStatus('Adaptive recommendation applied. Review the range, then run the backtest.',true);
   }
 
   function readConfig(){return {model:$('strategy').value,granularity:$('granularity').value,initialBalance:Number($('initial-balance').value),bottom:Number($('bottom').value),top:Number($('top').value),numGrids:Number($('num-grids').value),spacing:document.querySelector('input[name=spacing]:checked').value,feeRate:Number($('fee').value)/100,reserveRate:Number($('reserve').value)/100,riskFreeRate:Number($('risk-free').value)/100,trigger:$('trigger-enabled').checked?Number($('trigger').value):null,tp:$('tp-enabled').checked?Number($('tp').value):null,sl:$('sl-enabled').checked?Number($('sl').value):null,sellOnStop:$('sell-on-stop').checked,endAction:$('end-action').value};}
@@ -481,7 +538,7 @@ var GridEngine = (() => {
         input.value=!resetDates&&converted?(converted<input.min?input.min:converted>input.max?input.max:converted):picker(name==='start-date'?Math.max(first,last-365*GridEngine.DAY):last,gran);
       }
       set('coverage',num(item.bars.length)+' bars · '+stamp(first)+' → '+stamp(last)+' UTC');
-      if(defaults)centerRange();else updatePreview();
+      if(defaults)centerRange();else updatePreview();updateAdaptivePreview();
       showStatus((result?'Data ready — press Run backtest to use these inputs.':'Data ready. Configure the grid or run the default setup.')+(item.invalid?' '+num(item.invalid)+' invalid observations excluded.':''),!!result);
       loadBusy=false;updateButtons();if(autoRun)await run();
     }catch(error){
@@ -704,14 +761,15 @@ var GridEngine = (() => {
     $('nav-toggle').addEventListener('click',()=>{document.body.classList.toggle('nav-collapsed');$('nav-toggle').setAttribute('aria-expanded',String(!document.body.classList.contains('nav-collapsed')));});
     for(const tab of document.querySelectorAll('[data-view]'))tab.addEventListener('click',()=>switchView(tab.dataset.view));$('mobile-view').addEventListener('change',e=>switchView(e.target.value));
     $('edit-configuration').addEventListener('click',()=>{$('configuration').open=!$('configuration').open;if($('configuration').open)$('granularity').focus();});$('run-quick').addEventListener('click',run);
-    $('config-form').addEventListener('submit',e=>{e.preventDefault();run();});$('target-profit-grid').addEventListener('input',()=>{syncGridsToProfitTarget();markDirty();});$('config-form').addEventListener('input',e=>{if(e.target.id!=='target-profit-grid')markDirty();});
+    $('config-form').addEventListener('submit',e=>{e.preventDefault();run();});$('target-profit-grid').addEventListener('input',()=>{syncGridsToProfitTarget();markDirty();});$('config-form').addEventListener('input',e=>{if(e.target.id!=='target-profit-grid')markDirty();if(['start-date','end-date','granularity'].includes(e.target.id))updateAdaptivePreview();});
+    for(const mode of document.querySelectorAll('input[name=setup-mode]'))mode.addEventListener('change',()=>{updateAdaptivePreview();markDirty();});$('apply-adaptive').addEventListener('click',applyAdaptive);
     $('strategy').addEventListener('change',()=>{$('end-action').value=$('strategy').value==='binance'?'stop':'mark';updateButtons();markDirty();});
     $('granularity').addEventListener('change',()=>{dirty=!!result;loadData();});$('retry').addEventListener('click',()=>loadData({reload:true,defaults:!result&&!$('bottom').value,autoRun:!result}));
     for(const button of document.querySelectorAll('[data-period]'))button.addEventListener('click',()=>setPeriod(button.dataset.period));for(const side of ['tp','sl','trigger'])$(side+'-enabled').addEventListener('change',()=>{$(side).disabled=!$(side+'-enabled').checked;markDirty();});
     $('center-range').addEventListener('click',centerRange);$('reset').addEventListener('click',reset);for(const id of ['chart-window','pnl-lens','pnl-unit'])$(id).addEventListener('change',renderCharts);
     $('side-filter').addEventListener('change',()=>{page=0;renderLog();});$('prev-page').addEventListener('click',()=>{page--;renderLog();});$('next-page').addEventListener('click',()=>{page++;renderLog();});
     $('export-trades').addEventListener('click',exportTrades);$('export-config').addEventListener('click',exportConfig);$('export-matches').addEventListener('click',exportMatches);$('export-summary').addEventListener('click',()=>{if(result)download('btc-grid-quant-summary.txt',result.quantSummary.text,'text/plain;charset=utf-8');});
-    loadData({resetDates:true,defaults:true,autoRun:true});
+    loadMvrvData();loadData({resetDates:true,defaults:true,autoRun:true});
   }
 
   document.addEventListener('DOMContentLoaded',init,{once:true});

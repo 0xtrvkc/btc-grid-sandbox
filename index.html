@@ -59,7 +59,7 @@
             <div class="field"><label for="end-date">To (UTC)</label><input id="end-date" type="datetime-local" required></div>
             <div class="field"><label for="initial-balance">Investment · USD</label><input id="initial-balance" type="number" min="0.01" max="1000000000000" step="any" value="1000" required></div>
           </div>
-          <div class="config-meta"><span id="coverage">Fetching BTC data…</span><span><button type="button" class="text-btn" data-period="30">30D</button><button type="button" class="text-btn" data-period="90">90D</button><button type="button" class="text-btn" data-period="365">1Y</button><button type="button" class="text-btn" data-period="all">All</button><button type="button" class="text-btn" id="retry">↻ Reload</button></span></div>
+          <div class="config-meta"><span id="coverage">Fetching BTC data…</span><span><label class="check" for="follow-latest" title="On each data load, end at the newest complete candle and keep a rolling one-year test window."><input type="checkbox" id="follow-latest" checked>Follow latest · rolling 1Y</label><button type="button" class="text-btn" data-period="30">30D</button><button type="button" class="text-btn" data-period="90">90D</button><button type="button" class="text-btn" data-period="365">1Y</button><button type="button" class="text-btn" data-period="all">All</button><button type="button" class="text-btn" id="retry">↻ Fetch newest</button></span></div>
           <div class="notice"><strong>Local high-fidelity data</strong> · Import flat timestamp/close JSON, OHLC JSON, or an array of timestamped rows. Minute data stays in this browser session and is never uploaded. <input id="local-data" type="file" accept=".json,application/json" aria-label="Import local BTC price or OHLC JSON"></div>
           <section class="adaptive-card" id="adaptive-card" data-state="manual" aria-labelledby="adaptive-title">
             <div class="adaptive-head"><div><div class="section-label">02 / Adaptive quant setup</div><h3 id="adaptive-title">Let the regime shape the grid</h3><p>Uses only price and MVRV observations available at the start of the selected test. No future bars enter the recommendation.</p></div><div class="adaptive-toggle" role="radiogroup" aria-label="Grid setup mode"><label><input type="radio" name="setup-mode" value="manual" checked>Manual</label><label><input type="radio" name="setup-mode" value="adaptive">Adaptive</label></div></div>
@@ -457,7 +457,7 @@ var GridEngine = (() => {
   function picker(t,gran){return iso(t).slice(0,gran==='1d'?10:16);}
   function inputTime(id,isEnd=false){const s=$(id).value;if(!s)return NaN;return Date.parse(s+(s.length===10?'T00:00:00Z':'Z'))+(isEnd&&s.length===10?GridEngine.DAY-1:0);}
   function selectedBars(){if(!dataset)return [];const start=inputTime('start-date'),end=inputTime('end-date',true);return dataset.bars.filter(b=>b.t>=start&&b.t<=end);}
-  function setPeriod(days){if(!dataset)return;const bars=dataset.bars,end=bars.at(-1).t,start=days==='all'?bars[0].t:Math.max(bars[0].t,end-Number(days)*GridEngine.DAY);$('start-date').value=picker(start,loadedGranularity);$('end-date').value=picker(end,loadedGranularity);markDirty();}
+  function setPeriod(days){if(!dataset)return;const bars=dataset.bars,end=bars.at(-1).t,start=days==='all'?bars[0].t:Math.max(bars[0].t,end-Number(days)*GridEngine.DAY);$('start-date').value=picker(start,loadedGranularity);$('end-date').value=picker(end,loadedGranularity);$('follow-latest').checked=days==='365';markDirty();}
   function centerRange(){
     const b=selectedBars()[0];if(!b)return;const precision=Math.max(0,4-Math.floor(Math.log10(b.p)));
     for(const [id,m] of [['bottom',.8],['top',1.2],['tp',1.25],['sl',.75],['trigger',1]])$(id).value=(b.p*m).toFixed(precision);syncGridLink();markDirty();
@@ -575,20 +575,23 @@ var GridEngine = (() => {
       if(!item){
         if(!FILES[gran])throw new Error('Import a minute JSON file to use 1M high-fidelity mode.');
         fetchController=new AbortController();const controller=fetchController,timeout=setTimeout(()=>controller.abort(),35000);
-        try{const response=await fetch(ROOT+FILES[gran],{signal:controller.signal,cache:reload?'reload':'default'});if(!response.ok)throw new Error('Price request returned HTTP '+response.status+'.');item={...GridEngine.parseData(await response.json()),fetchedAt:new Date().toISOString()};cache.set(gran,item);}
+        try{const url=ROOT+FILES[gran]+(reload?'?fresh='+Date.now():'');const response=await fetch(url,{signal:controller.signal,cache:reload?'no-store':'default'});if(!response.ok)throw new Error('Price request returned HTTP '+response.status+'.');item={...GridEngine.parseData(await response.json()),fetchedAt:new Date().toISOString()};cache.set(gran,item);}
         finally{clearTimeout(timeout);}
       }
       if(id!==loadId)return;dataset=item;loadedGranularity=gran;loadTime=item.fetchedAt;
       const first=item.bars[0].t,last=item.bars.at(-1).t;
+      const followLatest=$('follow-latest').checked&&!item.local;
       for(const name of ['start-date','end-date']){
         const input=$(name),old=input.value;
         input.type=gran==='1d'?'date':'datetime-local';input.step=gran==='1d'?'1':String(GridEngine.INTERVALS[gran]/1000);input.min=picker(first,gran);input.max=picker(last,gran);
         const converted=gran==='1d'?old.slice(0,10):old.length===10?old+'T00:00':old;
-        input.value=!resetDates&&converted?(converted<input.min?input.min:converted>input.max?input.max:converted):picker(name==='start-date'?Math.max(first,last-365*GridEngine.DAY):last,gran);
+        input.value=!resetDates&&!followLatest&&converted?(converted<input.min?input.min:converted>input.max?input.max:converted):picker(name==='start-date'?Math.max(first,last-365*GridEngine.DAY):last,gran);
       }
-      set('coverage',num(item.bars.length)+' bars · '+stamp(first)+' → '+stamp(last)+' UTC'+(item.local?' · local '+item.sourceName:''));
+      const age=Math.max(0,Date.now()-last),expected=GridEngine.INTERVALS[gran],stale=!item.local&&age>Math.max(3*expected,2*GridEngine.DAY),quality=[];
+      if(item.invalid)quality.push(num(item.invalid)+' invalid excluded');if(item.duplicates)quality.push(num(item.duplicates)+' duplicate timestamps replaced');if(stale)quality.push('SOURCE STALE · newest candle '+Math.floor(age/GridEngine.DAY)+'d old');
+      set('coverage',num(item.bars.length)+' bars · '+stamp(first)+' → '+stamp(last)+' UTC · '+(followLatest?'rolling 1Y':'fixed dates')+(item.local?' · local '+item.sourceName:'')+(quality.length?' · '+quality.join(' · '):''));
       if(defaults)centerRange();else updatePreview();updateAdaptivePreview();
-      showStatus((result?'Data ready — press Run backtest to use these inputs.':'Data ready. Configure the grid or run the default setup.')+(item.invalid?' '+num(item.invalid)+' invalid observations excluded.':''),!!result);
+      showStatus((stale?'Source loaded, but its newest candle is stale. Update the analytics data before treating this as current.':result?'Newest data loaded — press Run backtest to update the results.':'Data ready. Configure the grid or run the default setup.')+(item.invalid?' '+num(item.invalid)+' invalid observations excluded.':''),stale||!!result);
       loadBusy=false;updateButtons();if(autoRun)await run();
     }catch(error){
       if(id!==loadId)return;dataset=null;loadedGranularity=null;loadBusy=false;updateButtons();set('coverage','Price data unavailable.');
@@ -846,7 +849,9 @@ var GridEngine = (() => {
     $('execution-mode').addEventListener('change',()=>{updateButtons();markDirty();});$('sizing-mode').addEventListener('change',()=>{updateButtons();markDirty();});
     for(const side of ['entry-override','exit-override'])$(side+'-enabled').addEventListener('change',()=>{updateButtons();markDirty();});
     $('local-data').addEventListener('change',e=>importLocalData(e.target.files?.[0]));
-    $('granularity').addEventListener('change',()=>{dirty=!!result;loadData();});$('retry').addEventListener('click',()=>loadData({reload:true,defaults:!result&&!$('bottom').value,autoRun:!result}));
+    for(const id of ['start-date','end-date'])$(id).addEventListener('input',()=>{$('follow-latest').checked=false;});
+    $('follow-latest').addEventListener('change',()=>{if($('follow-latest').checked)loadData({resetDates:true,reload:true});else markDirty();});
+    $('granularity').addEventListener('change',()=>{dirty=!!result;loadData();});$('retry').addEventListener('click',()=>loadData({reload:true,resetDates:$('follow-latest').checked,defaults:!result&&!$('bottom').value,autoRun:!result}));
     for(const button of document.querySelectorAll('[data-period]'))button.addEventListener('click',()=>setPeriod(button.dataset.period));for(const side of ['tp','sl','trigger'])$(side+'-enabled').addEventListener('change',()=>{$(side).disabled=!$(side+'-enabled').checked;markDirty();});
     $('center-range').addEventListener('click',centerRange);$('reset').addEventListener('click',reset);for(const id of ['chart-window','pnl-lens','pnl-unit'])$(id).addEventListener('change',renderCharts);
     $('side-filter').addEventListener('change',()=>{page=0;renderLog();});$('prev-page').addEventListener('click',()=>{page--;renderLog();});$('next-page').addEventListener('click',()=>{page++;renderLog();});

@@ -13,6 +13,8 @@ A browser-only BTC spot-grid backtester in one `index.html`. Download it and ope
 5. Press **Run backtest**. Input changes take effect on the next run. **Reset** restores the default configuration and runs it again.
 6. Inspect **Overview**, **Profit lab**, **Risk & drawdown**, **Quant summary** and **Execution log**. Use the exports to save the run, fills, matched pairs or summary.
 
+**Grid intervals and Net Profit / Grid are linked in both directions.** Editing the profit target solves for the nearest valid integer interval count. Editing the interval count recalculates the achievable average net profit after both fill fees. Range, fee, spacing and model changes preserve whichever of those two controls you edited last.
+
 ### Cash-flow-first overview
 
 The first result block separates the grid engine's realized cash flow from the marked account value. A grid can harvest profitable buy→sell cycles while its remaining BTC inventory is underwater, so the dashboard presents both without allowing one to hide the other.

@@ -13,6 +13,18 @@ A browser-only BTC spot-grid backtester in one `index.html`. Download it and ope
 5. Press **Run backtest**. Input changes take effect on the next run. **Reset** restores the default configuration and runs it again.
 6. Inspect **Overview**, **Profit lab**, **Risk & drawdown**, **Quant summary** and **Execution log**. Use the exports to save the run, fills, matched pairs or summary.
 
+### Execution fidelity and exchange reconciliation
+
+The simulator provides three explicit execution modes:
+
+- **Close-only · conservative:** original close-to-close crossing logic. Intrabar reversals are invisible.
+- **OHLC path · estimated:** accepts timestamped OHLC JSON and traverses O→L→H→C for an up bar or O→H→L→C for a down bar. This is an estimate because OHLC does not reveal the true tick sequence.
+- **Close-only · calibrated sensitivity:** leaves every simulated fill and account statistic unchanged, while showing a separate grid-profit sensitivity using a user-entered fill multiplier.
+
+Local JSON import accepts a flat `{timestamp: close}` object, timestamp keys whose values are OHLC objects, or an array of timestamped rows. Unix timestamps in seconds or milliseconds are supported. Files remain local to the browser. Minute-spaced imports automatically select **1M · imported**, allowing higher-fidelity reconstruction without shipping a very large permanent dataset with the app.
+
+Order sizing can remain capital-feasible or use an exact fractional **BTC per order**. Exact entry and final-exit price overrides reproduce known exchange executions without changing the selected timestamps. Optional exchange grid profit and matched-cycle inputs populate the execution-fidelity audit with fill capture, profit error and the most likely discrepancy driver. They never tune the backtest.
+
 ### Adaptive quant setup
 
 The configuration now includes an optional **Adaptive** setup assistant. It combines the selected price file with `mvrv.json` from the companion analytics repository and proposes a grid as of the selected backtest start:
@@ -49,6 +61,7 @@ Changing the date range does not automatically recenter an existing grid. Use **
 ## Research views
 
 - **Overview:** net ROI beside buy & hold, matched grid profit, maximum drawdown, APR, CAGR, Sharpe, fees and balances; equity, price/fill and underwater charts.
+- **Execution fidelity audit:** data resolution, simulated cycles, calibrated sensitivity, exchange fill capture, profit error and discrepancy attribution.
 - **Profit lab:** grid and bot APR, hypothetical APY, two P&L attribution lenses, a waterfall, profit by interval, monthly return map and daily return distribution.
 - **Risk:** drawdown depth and duration, recovery needed, BTC exposure, Calmar, Sortino, volatility, Ulcer Index, historical daily VaR/expected shortfall and recovery episodes.
 - **Quant summary:** a deterministic narrative from the actual run, rolling returns, BTC beta/correlation and a detailed scorecard. No external AI service.
@@ -116,7 +129,9 @@ Prices are fetched directly from [dynamic-btc-analytics-dashboard](https://githu
 
 Adaptive setup additionally requests `mvrv.json` from that repository. If it is unavailable, price-only backtests and manual configuration continue to work; the adaptive readout reports MVRV as unavailable rather than substituting a future or fabricated value.
 
-There are no candles, volume or intrabar paths. A fill is simulated when consecutive closes cross an active grid boundary, at that boundary's price; multiple crossed levels execute in price order. Seed purchases and risk exits execute at an observed close. Stops are evaluated at the close after crossed grid orders. Out-of-range activity resumes when closes return to the range. Spread, slippage, exchange queue priority and tick-accurate execution are not modeled.
+Remote bundled datasets contain closes only. A fill is simulated when consecutive closes cross an active grid boundary, at that boundary's price; multiple crossed levels execute in price order. Imported OHLC data can use the documented deterministic path estimate, and imported minute data can substantially reduce missed reversals. Neither mode establishes the exact exchange tick path. Spread, slippage, exchange queue priority and tick-accurate execution are not modeled.
+
+Exact entry/exit overrides affect seed or final-liquidation executions only. A calibrated multiplier is reporting-only: it does not create trades or change total P&L, ROI, drawdown or balances. Exchange comparison fields are similarly diagnostic and never influence the engine.
 
 Uses [Chart.js 4.4.1 from cdnjs](https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js) and [annotation plugin 3.0.1 from jsDelivr](https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js). Computation runs in an inline Blob worker, with a synchronous fallback where worker creation is unavailable. No account connection is needed.
 

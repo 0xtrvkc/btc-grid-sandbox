@@ -436,7 +436,7 @@ var GridEngine = (() => {
   let activeView='backtest';
   const $=id=>document.getElementById(id),ROOT='https://raw.githubusercontent.com/0xtrvkc/dynamic-btc-analytics-dashboard/main/';
   const FILES={'1d':'btc_daily_price.json','4h':'btc_4h_price.json','1h':'btc_1h_price.json','1m':null},cache=new Map();
-  let dataset=null,loadedGranularity=null,mvrvData=null,mvrvError=null,adaptiveRecommendation=null,result=null,charts=[],worker=null,workerURL=null,fetchController=null,loadId=0,busy=false,loadBusy=false,dirty=false,page=0,loadTime=null;
+  let dataset=null,loadedGranularity=null,mvrvData=null,mvrvError=null,adaptiveRecommendation=null,result=null,charts=[],worker=null,workerURL=null,fetchController=null,loadId=0,busy=false,loadBusy=false,dirty=false,page=0,loadTime=null,gridLinkDriver='target';
   const usd=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}),int=new Intl.NumberFormat('en-US');
   const money=v=>v==null||!Number.isFinite(v)?'N/A':usd.format(v),pct=(v,signed=true)=>v==null||!Number.isFinite(v)?'N/A':(v>0&&signed?'+':'')+(Math.abs(v)>1e7?v.toExponential(2):v.toFixed(2))+'%',num=v=>int.format(v),iso=t=>new Date(t).toISOString(),stamp=t=>iso(t).slice(0,16).replace('T',' ');
   const btcFmt=v=>v.toLocaleString('en-US',{minimumFractionDigits:8,maximumFractionDigits:8}),set=(id,v)=>$(id).textContent=v;
@@ -460,7 +460,7 @@ var GridEngine = (() => {
   function setPeriod(days){if(!dataset)return;const bars=dataset.bars,end=bars.at(-1).t,start=days==='all'?bars[0].t:Math.max(bars[0].t,end-Number(days)*GridEngine.DAY);$('start-date').value=picker(start,loadedGranularity);$('end-date').value=picker(end,loadedGranularity);markDirty();}
   function centerRange(){
     const b=selectedBars()[0];if(!b)return;const precision=Math.max(0,4-Math.floor(Math.log10(b.p)));
-    for(const [id,m] of [['bottom',.8],['top',1.2],['tp',1.25],['sl',.75],['trigger',1]])$(id).value=(b.p*m).toFixed(precision);markDirty();
+    for(const [id,m] of [['bottom',.8],['top',1.2],['tp',1.25],['sl',.75],['trigger',1]])$(id).value=(b.p*m).toFixed(precision);syncGridLink();markDirty();
   }
 
   async function loadMvrvData(reload=false){
@@ -510,7 +510,7 @@ var GridEngine = (() => {
 
   function applyAdaptive(){
     updateAdaptivePreview();const r=adaptiveRecommendation;if(!r)return;
-    $('bottom').value=r.lower.toFixed(2);$('top').value=r.upper.toFixed(2);$('reserve').value=r.reserve.toFixed(1);$('target-profit-grid').value=r.target.toFixed(2);document.querySelector('input[name=spacing][value=geometric]').checked=true;syncGridsToProfitTarget();markDirty();
+    $('bottom').value=r.lower.toFixed(2);$('top').value=r.upper.toFixed(2);$('reserve').value=r.reserve.toFixed(1);$('target-profit-grid').value=r.target.toFixed(2);document.querySelector('input[name=spacing][value=geometric]').checked=true;gridLinkDriver='target';syncGridLink();markDirty();
     showStatus('Adaptive recommendation applied. Review the range, then run the backtest.',true);
   }
 
@@ -544,6 +544,13 @@ var GridEngine = (() => {
     if(best)$('num-grids').value=best.n;
   }
 
+  function syncProfitTargetToGrids(){
+    const c=readConfig();
+    try{const range=gridProfitRange(c,c.numGrids);if(Number.isFinite(range.average))$('target-profit-grid').value=Math.max(.001,range.average).toFixed(3);}catch{}
+  }
+
+  function syncGridLink(){gridLinkDriver==='target'?syncGridsToProfitTarget():syncProfitTargetToGrids();}
+
   function updatePreview(){
     const c=readConfig(),binance=c.model==='binance';$('num-grids').max=binance?'170':'200';set('grids-label',binance?'Grids · intervals':'Grid price levels');
     set('model-rules',binance?'N intervals create N + 1 prices. Enter a target net profit per grid to solve for the nearest valid integer interval count. Capital-feasible sizing; USD fees and a configurable cash buffer.':'Original v1 sizing: 50% BTC seed; fixed quantity = initial balance / levels / activation price. Target net profit solves for the nearest valid price-level count.');
@@ -554,7 +561,7 @@ var GridEngine = (() => {
       set('profit-grid-calculation',targetText+' target → '+c.numGrids+(binance?' intervals':' price levels')+' → '+levels.length+' prices → '+range.average.toFixed(3)+'% average net');
       const first=selectedBars()[0];let sizing='Size locked on activation';
       if(first&&first.p>=c.bottom&&first.p<=c.top&&c.trigger==null&&c.initialBalance>0){const init=GridEngine.setup(c,first.p);sizing=btcFmt(init.qty)+' BTC / order';}
-      set('grid-preview','Closest integer fit · '+fitText+' · center '+money(center)+' · '+step+' · '+sizing);
+      set('grid-preview','Two-way linked from '+(gridLinkDriver==='target'?'NET PROFIT TARGET':'GRID INTERVALS')+' · '+fitText+' · center '+money(center)+' · '+step+' · '+sizing);
       set('config-summary',(binance?'Binance-style':'Original simple')+' · '+c.numGrids+(binance?' intervals':' levels')+' · '+c.spacing+' · '+(c.feeRate*100).toLocaleString('en-US',{maximumFractionDigits:3})+'% fee');
     }catch{set('profit-grid-calculation','Waiting for valid inputs…');set('grid-preview','Enter a positive range, target profit and valid integer grid count.');set('profit-grid-actual','Actual —');}
     if(dataset){const bars=selectedBars();set('selection-note',bars.length?num(bars.length)+' bars · '+stamp(bars[0].t)+' → '+stamp(bars.at(-1).t)+' UTC':'No observed bars in this date range.');}
@@ -765,7 +772,7 @@ var GridEngine = (() => {
   function exportTrades(){if(!result)return;const rows=[['side','timestamp_utc','price_usd','quantity_btc','grid_level','cycle','kind','fee_usd','running_pnl_usd','cumulative_realized_pnl_usd','fiat_balance_usd','btc_balance','matched_profit_usd','cumulative_grid_profit_usd'],...result.trades.map(t=>[t.side,iso(t.t),t.price,t.qty,t.level??'',t.cycle??'',t.kind,t.fee,t.pnl,t.realized,t.fiat,t.btc,t.matchedProfit??'',t.gridProfit])];download('btc-grid-trades.csv',rows.map(row=>row.join(',')).join('\r\n'),'text/csv;charset=utf-8');}
 
   async function reset(){
-    ++loadId;stopWorker();if(fetchController)fetchController.abort();for(const [key,value] of cache)if(value.local)cache.delete(key);busy=false;loadBusy=false;result=null;dirty=false;page=0;destroyCharts();$('config-form').reset();$('local-data').value='';$('granularity').value='4h';$('strategy').value='binance';for(const k of ['tp','sl','trigger','fixed-qty','fill-multiplier','entry-override','exit-override'])$(k).disabled=true;$('run').textContent='▶ Run backtest';$('progress').hidden=true;$('results').hidden=true;$('empty').hidden=false;$('error').hidden=true;$('configuration').open=false;$('chart-window').value='all';$('side-filter').value='all';$('pnl-lens').value='grid';$('pnl-unit').value='usd';for(const id of ['export-trades','export-config','export-matches'])$(id).disabled=true;set('log-meta','Run a backtest to inspect fills.');renderLog();switchView('backtest');await loadData({resetDates:true,defaults:true,autoRun:true});
+    ++loadId;stopWorker();if(fetchController)fetchController.abort();for(const [key,value] of cache)if(value.local)cache.delete(key);busy=false;loadBusy=false;result=null;dirty=false;page=0;gridLinkDriver='target';destroyCharts();$('config-form').reset();$('local-data').value='';$('granularity').value='4h';$('strategy').value='binance';for(const k of ['tp','sl','trigger','fixed-qty','fill-multiplier','entry-override','exit-override'])$(k).disabled=true;$('run').textContent='▶ Run backtest';$('progress').hidden=true;$('results').hidden=true;$('empty').hidden=false;$('error').hidden=true;$('configuration').open=false;$('chart-window').value='all';$('side-filter').value='all';$('pnl-lens').value='grid';$('pnl-unit').value='usd';for(const id of ['export-trades','export-config','export-matches'])$(id).disabled=true;set('log-meta','Run a backtest to inspect fills.');renderLog();switchView('backtest');await loadData({resetDates:true,defaults:true,autoRun:true});
   }
 
   function formatRatio(v,infinite=false){return infinite?'∞':v==null||!Number.isFinite(v)?'N/A':v.toFixed(2);}
@@ -833,7 +840,7 @@ var GridEngine = (() => {
     $('nav-toggle').addEventListener('click',()=>{document.body.classList.toggle('nav-collapsed');$('nav-toggle').setAttribute('aria-expanded',String(!document.body.classList.contains('nav-collapsed')));});
     for(const tab of document.querySelectorAll('[data-view]'))tab.addEventListener('click',()=>switchView(tab.dataset.view));$('mobile-view').addEventListener('change',e=>switchView(e.target.value));
     $('edit-configuration').addEventListener('click',()=>{$('configuration').open=!$('configuration').open;if($('configuration').open)$('granularity').focus();});$('run-quick').addEventListener('click',run);
-    $('config-form').addEventListener('submit',e=>{e.preventDefault();run();});$('target-profit-grid').addEventListener('input',()=>{syncGridsToProfitTarget();markDirty();});$('config-form').addEventListener('input',e=>{if(e.target.id!=='target-profit-grid')markDirty();if(['start-date','end-date','granularity'].includes(e.target.id))updateAdaptivePreview();});
+    $('config-form').addEventListener('submit',e=>{e.preventDefault();run();});$('config-form').addEventListener('input',e=>{const linked=e.target.id==='target-profit-grid'||e.target.id==='num-grids'||['bottom','top','fee','strategy'].includes(e.target.id)||e.target.name==='spacing';if(e.target.id==='target-profit-grid')gridLinkDriver='target';else if(e.target.id==='num-grids')gridLinkDriver='grids';if(linked)syncGridLink();markDirty();if(['start-date','end-date','granularity'].includes(e.target.id))updateAdaptivePreview();});
     for(const mode of document.querySelectorAll('input[name=setup-mode]'))mode.addEventListener('change',()=>{updateAdaptivePreview();markDirty();});$('apply-adaptive').addEventListener('click',applyAdaptive);
     $('strategy').addEventListener('change',()=>{$('end-action').value=$('strategy').value==='binance'?'stop':'mark';updateButtons();markDirty();});
     $('execution-mode').addEventListener('change',()=>{updateButtons();markDirty();});$('sizing-mode').addEventListener('change',()=>{updateButtons();markDirty();});

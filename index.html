@@ -24,6 +24,7 @@
 @media(max-width:800px){.window-body{display:block}.header{align-items:flex-start;flex-wrap:wrap;gap:14px}.header-actions{justify-content:flex-start;flex-wrap:nowrap}.config-card summary>span:last-of-type{display:none}.content{padding:18px 14px}.hero-stats .stat{padding:14px 13px 9px}.hero-stats .stat-val{font-size:29px}.quant-snapshot{padding:15px;gap:13px}.snapshot-symbol{display:none}.run-heading .chart-tools{width:100%;justify-content:flex-start}.chart-wrap.overview-equity{height:230px}.chart-wrap.medium{height:220px}.panel-heading h2{font-size:23px}.chart-card{padding:16px 14px}.config-body{padding:15px}.config-footer{align-items:flex-start}.config-footer>.actions{align-self:flex-end}.heatmap-scroll{max-height:440px}.metric-strip small{font-size:9px}}
 @media(max-width:480px){.hero-stats .stat-val{font-size:26px}.hero-stats .stat-label{font-size:8px;min-height:26px}.hero-stats .stat-sub{min-height:30px}.hero-stats .spark{height:25px;margin-top:6px}.spark svg{height:25px}.g4{gap:9px}.header-actions{width:100%}.header-actions button{flex:1}.metric-strip strong{font-size:21px}.quant-snapshot h2{font-size:14px}.run-badge{font-size:8px}.run-heading #result-period{font-size:10px}.preview-box{padding:12px}.preview-box #grid-preview{width:100%}.chart-wrap{height:290px}.chart-wrap.medium{height:220px}.chart-wrap.underwater{height:155px}.toolbar-actions{flex-wrap:wrap}.toolbar-actions button{flex:1 1 100px}.quant-note{padding:17px}.scorecard-row strong{white-space:normal}.config-footer>.actions{width:100%}.config-footer>.actions .primary{flex:1}.config-footer button{font-size:12px}.heatmap button{font-size:10px}}
 .adaptive-card{margin:4px 0 18px;border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:5px;background:linear-gradient(120deg,color-mix(in srgb,var(--accent) 5%,var(--surface)),var(--surface));padding:16px}.adaptive-head{display:flex;align-items:flex-start;justify-content:space-between;gap:15px}.adaptive-head h3{font-size:15px;margin:0}.adaptive-head p{font-size:11px;color:var(--muted);margin:3px 0 0}.adaptive-toggle{display:flex;min-width:240px;border:1px solid var(--border);border-radius:4px;overflow:hidden}.adaptive-toggle label{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;min-height:38px;background:var(--bg);font-size:11px;cursor:pointer}.adaptive-toggle label+label{border-left:1px solid var(--border)}.adaptive-toggle label:has(input:checked){color:var(--accent);background:var(--faint)}.adaptive-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:14px}.adaptive-metric{padding:10px;border:1px solid var(--border);border-radius:4px;background:var(--bg);min-width:0}.adaptive-metric span{display:block;color:var(--muted);font:9px ui-monospace,monospace;letter-spacing:.05em;text-transform:uppercase}.adaptive-metric strong{display:block;margin-top:3px;font:600 14px ui-monospace,monospace;overflow-wrap:anywhere}.adaptive-reason{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)}.adaptive-reason p{margin:0;color:var(--muted);font-size:11px;line-height:1.55}.adaptive-reason button{flex:0 0 auto}.adaptive-card[data-state=manual] .adaptive-grid,.adaptive-card[data-state=manual] .adaptive-reason{opacity:.55}.adaptive-card[data-state=manual] #apply-adaptive{display:none}@media(max-width:1100px){.adaptive-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:700px){.adaptive-head{flex-direction:column}.adaptive-toggle{width:100%;min-width:0}.adaptive-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.adaptive-reason{align-items:stretch;flex-direction:column}.adaptive-reason button{width:100%}}@media(max-width:420px){.adaptive-grid{grid-template-columns:1fr}.adaptive-metric{display:flex;align-items:center;justify-content:space-between;gap:10px}.adaptive-metric strong{margin:0;text-align:right}}
+.notice input[type=file]{display:inline-block;width:auto;max-width:100%;min-height:34px;margin-left:10px;padding:4px;font-size:11px;background:var(--bg)}.notice input[type=file]::file-selector-button{border:1px solid var(--border);border-radius:3px;background:var(--surface2);color:var(--text);padding:5px 9px;margin-right:8px;cursor:pointer}@media(max-width:620px){.notice input[type=file]{display:block;width:100%;margin:9px 0 0}.scorecard-row{gap:10px}.scorecard-row strong{max-width:55%;white-space:normal}}
 
 </style>
 </head>
@@ -52,12 +53,13 @@
         <form id="config-form" class="config-body" novalidate>
           <div class="section-label">01 / Market &amp; capital</div>
           <div class="form-grid">
-            <div class="field"><label for="granularity">Granularity</label><select id="granularity"><option value="1d">Daily · 1D</option><option value="4h" selected>4 hours · 4H</option><option value="1h">1 hour · 1H</option></select></div>
+            <div class="field"><label for="granularity">Granularity</label><select id="granularity"><option value="1d">Daily · 1D</option><option value="4h" selected>4 hours · 4H</option><option value="1h">1 hour · 1H</option><option value="1m">1 minute · imported</option></select></div>
             <div class="field"><label for="start-date">From (UTC)</label><input id="start-date" type="datetime-local" required></div>
             <div class="field"><label for="end-date">To (UTC)</label><input id="end-date" type="datetime-local" required></div>
             <div class="field"><label for="initial-balance">Investment · USD</label><input id="initial-balance" type="number" min="0.01" max="1000000000000" step="any" value="10000" required></div>
           </div>
           <div class="config-meta"><span id="coverage">Fetching BTC data…</span><span><button type="button" class="text-btn" data-period="30">30D</button><button type="button" class="text-btn" data-period="90">90D</button><button type="button" class="text-btn" data-period="365">1Y</button><button type="button" class="text-btn" data-period="all">All</button><button type="button" class="text-btn" id="retry">↻ Reload</button></span></div>
+          <div class="notice"><strong>Local high-fidelity data</strong> · Import flat timestamp/close JSON, OHLC JSON, or an array of timestamped rows. Minute data stays in this browser session and is never uploaded. <input id="local-data" type="file" accept=".json,application/json" aria-label="Import local BTC price or OHLC JSON"></div>
           <section class="adaptive-card" id="adaptive-card" data-state="manual" aria-labelledby="adaptive-title">
             <div class="adaptive-head"><div><div class="section-label">02 / Adaptive quant setup</div><h3 id="adaptive-title">Let the regime shape the grid</h3><p>Uses only price and MVRV observations available at the start of the selected test. No future bars enter the recommendation.</p></div><div class="adaptive-toggle" role="radiogroup" aria-label="Grid setup mode"><label><input type="radio" name="setup-mode" value="manual" checked>Manual</label><label><input type="radio" name="setup-mode" value="adaptive">Adaptive</label></div></div>
             <div class="adaptive-grid" aria-live="polite"><div class="adaptive-metric"><span>Regime</span><strong id="adaptive-regime">Manual</strong></div><div class="adaptive-metric"><span>Grid suitability</span><strong id="adaptive-score">—</strong></div><div class="adaptive-metric"><span>MVRV / Z</span><strong id="adaptive-mvrv">Loading…</strong></div><div class="adaptive-metric"><span>30D / 90D ROC</span><strong id="adaptive-roc">—</strong></div><div class="adaptive-metric"><span>Annualized vol</span><strong id="adaptive-vol">—</strong></div></div>
@@ -76,6 +78,14 @@
           </div>
           <div class="preview-box"><div><label class="small muted" for="target-profit-grid">NET PROFIT / GRID · TARGET</label><div class="profit-grid-entry"><input id="target-profit-grid" type="number" min="0.001" max="100" step="0.01" inputmode="decimal" value="1" aria-describedby="profit-grid-actual profit-grid-calculation"><span>%</span></div><span class="profit-grid-actual" id="profit-grid-actual">Actual —</span></div><div class="profit-grid-result"><span class="small muted">FINISHED CALCULATION</span><strong id="profit-grid-calculation">Waiting for valid inputs…</strong><span class="profit-grid-fit" id="grid-preview">Target → intervals → levels → actual net profit</span></div><button type="button" class="text-btn" id="center-range">Center on first close ±20%</button></div>
           <details class="advanced-settings"><summary>Trigger, stop controls &amp; analytics settings</summary><div class="form-grid">
+            <div class="field"><label for="execution-mode">Execution fidelity</label><select id="execution-mode"><option value="close">Close-only · conservative</option><option value="ohlc">OHLC path · estimated</option><option value="calibrated">Close-only · calibrated sensitivity</option></select><span class="small muted">OHLC estimates an O→L→H→C path on up bars and O→H→L→C on down bars.</span></div>
+            <div class="field"><label for="fill-multiplier">Fill multiplier · sensitivity</label><input id="fill-multiplier" type="number" min="0.1" max="10" step="0.01" value="1" disabled><span class="small muted">Reporting only; never fabricates trades or account equity.</span></div>
+            <div class="field"><label for="sizing-mode">Order sizing</label><select id="sizing-mode"><option value="auto">Auto · capital feasible</option><option value="fixed">Fixed BTC per order</option></select></div>
+            <div class="field"><label for="fixed-qty">BTC per order</label><input id="fixed-qty" type="number" min="0.00000001" step="any" placeholder="0.00013" disabled></div>
+            <div class="field"><label class="check" for="entry-override-enabled"><input type="checkbox" id="entry-override-enabled">Exact entry execution · USD</label><input id="entry-override" type="number" min="0.00000001" step="any" disabled></div>
+            <div class="field"><label class="check" for="exit-override-enabled"><input type="checkbox" id="exit-override-enabled">Exact final exit · USD</label><input id="exit-override" type="number" min="0.00000001" step="any" disabled></div>
+            <div class="field"><label for="actual-grid-profit">Exchange grid profit · optional</label><input id="actual-grid-profit" type="number" step="any" placeholder="For comparison"></div>
+            <div class="field"><label for="actual-cycles">Exchange matched cycles · optional</label><input id="actual-cycles" type="number" min="0" step="1" placeholder="For capture rate"></div>
             <div class="field"><label class="check" for="trigger-enabled"><input type="checkbox" id="trigger-enabled">Entry trigger · BTC price</label><input id="trigger" aria-label="Entry trigger in USD" type="number" min="0.00000001" step="any" disabled></div>
             <div class="field"><label class="check" for="tp-enabled"><input type="checkbox" id="tp-enabled">Take profit · BTC price</label><input id="tp" aria-label="Take-profit threshold in USD" type="number" min="0.00000001" step="any" disabled></div>
             <div class="field"><label class="check" for="sl-enabled"><input type="checkbox" id="sl-enabled">Stop loss · BTC price</label><input id="sl" aria-label="Stop-loss threshold in USD" type="number" min="0.00000001" step="any" disabled></div>
@@ -96,6 +106,7 @@
             <article class="stat"><div class="stat-label">Matched grid profit · net</div><div class="stat-val" id="grid-profit">—</div><div class="stat-sub" id="grid-profit-sub">Completed buy → sell pairs</div><div class="spark" id="spark-grid"></div></article>
             <article class="stat"><div class="stat-label">Maximum drawdown</div><div class="stat-val negative" id="max-dd">—</div><div class="stat-sub" id="max-dd-sub">Peak-to-trough equity loss</div><div class="spark" id="spark-dd"></div></article>
           </div>
+          <article class="info" id="fidelity-comparison"><h3>Execution fidelity audit</h3><div class="scorecard"><div class="scorecard-row"><span>Data resolution / method</span><strong id="fidelity-method">—</strong></div><div class="scorecard-row"><span>Detected matched cycles</span><strong id="fidelity-cycles">—</strong></div><div class="scorecard-row"><span>Calibrated grid-profit sensitivity</span><strong id="fidelity-adjusted">—</strong></div><div class="scorecard-row"><span>Exchange fill capture</span><strong id="fidelity-capture">Not supplied</strong></div><div class="scorecard-row"><span>Grid-profit error</span><strong id="fidelity-error">Not supplied</strong></div><div class="scorecard-row"><span>Main discrepancy driver</span><strong id="fidelity-driver">—</strong></div></div><p id="fidelity-note">Close-only fills are a conservative reconstruction.</p></article>
           <div class="quant-snapshot"><div class="snapshot-symbol" aria-hidden="true">∑</div><div><div class="section-label">QUANT READOUT</div><h2 id="snapshot-title">Calculating the result…</h2><p id="snapshot-text"></p></div><button class="text-btn" data-view="quant">Full quant summary ↗</button></div>
           <div class="metric-strip"><div><span>Total APR</span><strong id="apr">—</strong><small>Simple annualization</small></div><div><span>CAGR</span><strong id="cagr">—</strong><small>Annualized equity growth</small></div><div><span>Daily Sharpe</span><strong id="sharpe">—</strong><small>365-day annualization</small></div><div><span>Total fees</span><strong id="fees">—</strong><small id="fees-sub">All simulated fills</small></div></div>
           <div class="balance-strip"><div><div class="stat-label">Final equity</div><div class="mono" id="final-equity">—</div></div><div><div class="stat-label">Fiat balance</div><div class="mono" id="final-fiat">—</div></div><div><div class="stat-label">Crypto balance</div><div class="mono" id="final-crypto">—</div></div><div><div class="stat-label">Total P&amp;L</div><div class="mono" id="final-pnl">—</div></div></div>
@@ -141,8 +152,9 @@
         <div class="panel-heading"><div class="eyebrow">06 / METHODOLOGY</div><h2>Every number has a definition.</h2><p>Financial accounting, execution assumptions and reference sources.</p></div>
         <div class="method-grid">
           <article class="info"><h3>Binance-style construction</h3><p>The default mode follows the <a href="https://www.binance.com/en/support/faq/detail/d5f441e8ab544a5b98241e00efb3a4ab" target="_blank" rel="noopener noreferrer">Binance spot-grid guide</a>: N intervals create N + 1 boundary prices, with equal dollar or proportional steps. The initial layout has one order per interval; lower boundaries below the entry close receive buys, remaining intervals receive sells at their upper boundary. This leaves one vacant price level. Filled orders reverse at the adjacent boundary.</p><p>Optional entry triggers and sell-on-stop controls are supported. Stops follow the guide’s range constraints. This implementation caps static grids at 170; it does not emulate the exchange’s dynamic order mechanism.</p></article>
-          <article class="info"><h3>Capital &amp; fee assumptions</h3><p>For activation price P, seed sell count S, pending buy prices L and cash buffer b, fixed order quantity is <code>Q = B(1−b) / [(ΣL + SP)(1+f)]</code>. Seed BTC is S×Q. Buys reserve notional plus fee; sells reserve BTC. This funds the whole initial layout. The buffer is an explicit sandbox assumption.</p><p>All fills charge USD fees. Binance may charge base currency or BNB and replenish fee reserves; that asset-conversion process, exchange rounding and minimum sizes are not simulated. The guide does not specify enough detail to reproduce exact exchange order quantities.</p></article>
-          <article class="info"><h3>Triggers, exits &amp; boundaries</h3><p>Without an entry trigger, initialize on the first observed close in range. With one, latch its first close-to-close crossing (or equality at start); activate at the first in-range close at or after that event. The seed trades at that observed close, never at an invented trigger execution price.</p><p>Inside the close-to-close path, crossed grid buys execute high to low and sells low to high. Boundary crossings can fill before price exits the range; no levels exist outside it. Risk checks run after grid fills at the new close. Stops cancel orders; the sell-on-stop setting either liquidates or retains BTC. Retained BTC continues to affect portfolio equity after the bot stops.</p></article>
+          <article class="info"><h3>Capital &amp; fee assumptions</h3><p>For activation price P, seed sell count S, pending buy prices L and cash buffer b, automatic order quantity is <code>Q = B(1−b) / [(ΣL + SP)(1+f)]</code>. Alternatively, fixed-quantity mode uses the entered fractional BTC amount and rejects a layout that cannot be initially funded. Seed BTC is S×Q.</p><p>All fills charge USD fees. Binance may charge base currency or BNB and replenish fee reserves; that asset-conversion process, exchange rounding and minimum sizes are not simulated.</p></article>
+          <article class="info"><h3>Triggers, exits &amp; boundaries</h3><p>Without an entry trigger, initialize on the first observation in range. An optional exact entry price replaces the seed execution price while preserving that timestamp; it must remain inside the grid. An exact final exit price replaces only the end-of-test liquidation price.</p><p>Crossed grid buys execute high to low and sells low to high. Stops cancel orders; sell-on-stop either liquidates or retains BTC. Retained BTC continues to affect portfolio equity after the bot stops.</p></article>
+          <article class="info wide"><h3>Execution fidelity &amp; local data</h3><p><strong>Close-only</strong> is the conservative default and cannot see reversals inside a bar. <strong>OHLC estimated</strong> accepts timestamped open/high/low/close objects and applies O→L→H→C to up bars or O→H→L→C to down bars. This exposes possible intrabar crossings but the true tick sequence is unknowable. <strong>1M imported</strong> uses local minute observations and is the preferred reconstruction when exchange fills are unavailable.</p><p>The calibrated multiplier changes only the displayed grid-profit sensitivity. It never changes fills, equity, ROI or drawdown. Optional exchange grid profit and cycle count calculate error and fill capture without feeding those actual outcomes back into the simulation.</p></article>
           <article class="info"><h3>Two consistent P&amp;L views</h3><p><strong>Grid attribution:</strong> total P&amp;L = net matched grid profit + floating / other P&amp;L. Match each grid buy only to the next adjacent sell in the same cycle; subtract both fees. Seed buys and stop liquidations are not matched grid pairs. The residual includes those unmatched effects and open inventory. Do not interpret it as pure unrealized profit.</p><p><strong>Inventory accounting:</strong> total P&amp;L = realized WAC P&amp;L + unrealized WAC P&amp;L. Weighted average cost includes entry fees. These are alternative decompositions, not amounts to add together. The waterfall uses gross matched spread, residual gross price effects and all fees exactly once.</p></article>
           <article class="info wide"><h3>Returns &amp; annualization</h3><p><a href="https://www.binance.com/en/support/faq/detail/688ff6ff08734848915de76a07b953dd" target="_blank" rel="noopener noreferrer">Binance’s parameter reference</a> distinguishes matched-pair grid profit and total account profit, and annualizes profit linearly using elapsed bot time. This page shows both the bot’s lifetime and the entire selected evaluation window.</p><div class="tbl-wrap"><table class="method-table"><thead><tr><th>Metric</th><th>Definition</th></tr></thead><tbody>
           <tr><td>Total ROI</td><td>(Ending equity / initial capital − 1) × 100. Equity includes all fees and BTC marked at the latest close. No deposits or withdrawals.</td></tr>
@@ -174,19 +186,21 @@
 /* Deterministic, DOM-free grid engine and analytics; shared with the Blob worker. */
 var GridEngine = (() => {
   'use strict';
-  const DAY=86400000,INTERVALS={'1d':DAY,'4h':DAY/6,'1h':DAY/24};
+  const DAY=86400000,INTERVALS={'1d':DAY,'4h':DAY/6,'1h':DAY/24,'1m':60000};
   function parseData(raw) {
-    if (!raw || typeof raw !== 'object' || Array.isArray(raw)) throw new Error('Expected a flat {date: close} JSON object.');
+    if (!raw || typeof raw !== 'object') throw new Error('Expected timestamped close or OHLC data.');
     const byTime = new Map(); let invalid=0,duplicates=0;
-    for (const [key,value] of Object.entries(raw)) {
-      const s=key.trim(), match=s.match(/^(\d{4}-\d{2}-\d{2})(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})?)?$/);
-      if (!match || typeof value !== 'number' || !Number.isFinite(value) || value<=0) {invalid++;continue;}
+    const source=Array.isArray(raw)?raw.map((row,i)=>[row.date??row.time??row.timestamp??row.t??String(i),row]):Object.entries(raw);
+    for (const [key,value] of source) {
+      const rawKey=String(key).trim(),epoch=/^\d{10,13}$/.test(rawKey)?Number(rawKey)*(rawKey.length===10?1000:1):null,s=epoch!=null&&Number.isFinite(epoch)?new Date(epoch).toISOString():rawKey,match=s.match(/^(\d{4}-\d{2}-\d{2})(?:T\d{2}:\d{2}(?::\d{2}(?:\.\d+)?)?(?:Z|[+-]\d{2}:\d{2})?)?$/);
+      const obj=value&&typeof value==='object'?value:null,close=typeof value==='number'?value:Number(obj?.close??obj?.c??obj?.price??obj?.y),open=obj?Number(obj.open??obj.o??close):close,high=obj?Number(obj.high??obj.h??Math.max(open,close)):Math.max(open,close),low=obj?Number(obj.low??obj.l??Math.min(open,close)):Math.min(open,close);
+      if (!match || ![open,high,low,close].every(v=>Number.isFinite(v)&&v>0)||high<Math.max(open,close)||low>Math.min(open,close)) {invalid++;continue;}
       const dateCheck=Date.parse(match[1]+'T00:00:00Z');
       if (!Number.isFinite(dateCheck) || new Date(dateCheck).toISOString().slice(0,10)!==match[1]) {invalid++;continue;}
       const t=Date.parse(s.length===10?s+'T00:00:00Z':(/[Zz]|[+-]\d{2}:\d{2}$/.test(s)?s:s+'Z'));
       if(!Number.isFinite(t)){invalid++;continue;}
       if(byTime.has(t))duplicates++;
-      byTime.set(t,{t,p:value});
+      byTime.set(t,{t,p:close,o:open,h:high,l:low,hasOHLC:high!==close||low!==close||open!==close});
     }
     const bars=[...byTime.values()].sort((a,b)=>a.t-b.t);
     if(bars.length<2)throw new Error('The file must contain at least two valid positive close prices.');
@@ -220,19 +234,23 @@ var GridEngine = (() => {
       for(let k=0;k<levels.length-1;k++)orders.push({id:k+1,side:levels[k]<p?'buy':'sell',index:levels[k]<p?k:k+1,funded:false,lot:null});
       const buys=orders.filter(o=>o.side==='buy'),sells=orders.length-buys.length;
       const denominator=(buys.reduce((s,o)=>s+levels[o.index],0)+sells*p)*(1+cfg.feeRate);
-      const qty=cfg.initialBalance*(1-(cfg.reserveRate??.01))/denominator;
+      const qty=cfg.fixedQty??cfg.initialBalance*(1-(cfg.reserveRate??.01))/denominator;
+      if(cfg.fixedQty!=null&&qty*denominator>cfg.initialBalance+Math.max(cfg.initialBalance*1e-12,1e-10))throw new Error('Fixed BTC/order exceeds the capital required to fund the initial grid layout.');
       return {levels,center,orders,qty,seedQty:sells*qty};
     }
     for(let k=0;k<levels.length;k++){
       if(levels[k]<=center&&levels[k]<p)orders.push({id:k+1,side:'buy',index:k,funded:false,lot:null});
       else if(levels[k]>center&&levels[k]>p)orders.push({id:k+1,side:'sell',index:k,funded:false,lot:null});
     }
-    return {levels,center,orders,qty:cfg.initialBalance/cfg.numGrids/p,seedQty:cfg.initialBalance/2/p};
+    return {levels,center,orders,qty:cfg.fixedQty??cfg.initialBalance/cfg.numGrids/p,seedQty:cfg.fixedQty!=null?orders.filter(o=>o.side==='sell').length*cfg.fixedQty:cfg.initialBalance/2/p};
   }
   function validateConfig(cfg,firstPrice){
     geometry(cfg);
     if(!Number.isFinite(cfg.initialBalance)||cfg.initialBalance<=0||cfg.initialBalance>1e12)throw new Error('Initial balance must be positive and at most 1 trillion USD.');
     if(!Number.isFinite(cfg.feeRate)||cfg.feeRate<0||cfg.feeRate>.1)throw new Error('Fee must be between 0% and 10%.');
+    if(cfg.fixedQty!=null&&(!Number.isFinite(cfg.fixedQty)||cfg.fixedQty<=0))throw new Error('Fixed BTC per order must be positive.');
+    for(const key of ['entryPriceOverride','exitPriceOverride'])if(cfg[key]!=null&&(!Number.isFinite(cfg[key])||cfg[key]<=0))throw new Error('Execution override prices must be positive.');
+    if(!['close','ohlc','calibrated'].includes(cfg.executionMode??'close'))throw new Error('Unsupported execution-fidelity mode.');
     if(!INTERVALS[cfg.granularity])throw new Error('Unsupported granularity.');
     if(cfg.reserveRate!=null&&(!Number.isFinite(cfg.reserveRate)||cfg.reserveRate<0||cfg.reserveRate>.25))throw new Error('Cash buffer must be between 0% and 25%.');
     if(cfg.riskFreeRate!=null&&(!Number.isFinite(cfg.riskFreeRate)||cfg.riskFreeRate<0||cfg.riskFreeRate>.25))throw new Error('Risk-free rate must be between 0% and 25%.');
@@ -354,13 +372,15 @@ var GridEngine = (() => {
       if(i)missing+=Math.max(0,Math.round((t-bars[i-1].t)/interval)-1);
       if(!triggered&&(p===cfg.trigger||(i&&((prev<cfg.trigger&&p>=cfg.trigger)||(prev>cfg.trigger&&p<=cfg.trigger)))))triggered=true;
       if(!active&&!exited&&triggered&&p>=cfg.bottom&&p<=cfg.top){
-        active=true;activation={t,price:p,index:i};const initial=setup(cfg,p);qty=initial.qty;orders=initial.orders;
-        if(initial.seedQty>0)execute('buy',p,initial.seedQty,t,null,null,'seed');
-        fundWaiting(p);initialOrders=orders.map(o=>({...o}));
+        const entryPrice=cfg.entryPriceOverride??p;if(entryPrice<cfg.bottom||entryPrice>cfg.top)throw new Error('Exact entry price must be inside the grid range.');
+        active=true;activation={t,price:entryPrice,index:i,observedPrice:p};const initial=setup(cfg,entryPrice);qty=initial.qty;orders=initial.orders;
+        if(initial.seedQty>0)execute('buy',entryPrice,initial.seedQty,t,null,null,'seed');
+        fundWaiting(entryPrice);initialOrders=orders.map(o=>({...o}));
       }else if(active&&i>0){
-        const side=p<prev?'buy':p>prev?'sell':null;
+        const points=cfg.executionMode==='ohlc'&&bars[i].hasOHLC?(p>=bars[i].o?[bars[i].o,bars[i].l,bars[i].h,p]:[bars[i].o,bars[i].h,bars[i].l,p]):[p];let segmentStart=prev;
+        for(const point of points){const side=point<segmentStart?'buy':point>segmentStart?'sell':null;
         if(side){
-          const indices=levels.map((v,k)=>k).filter(k=>side==='buy'?p<=levels[k]&&levels[k]<prev:prev<levels[k]&&levels[k]<=p);if(side==='buy')indices.reverse();
+          const indices=levels.map((v,k)=>k).filter(k=>side==='buy'?point<=levels[k]&&levels[k]<segmentStart:segmentStart<levels[k]&&levels[k]<=point);if(side==='buy')indices.reverse();
           for(const k of indices){
             const at=orders.filter(o=>o.side===side&&o.index===k).sort((a,b)=>a.id-b.id);
             for(const order of at){
@@ -377,10 +397,10 @@ var GridEngine = (() => {
               if(order.index<0||order.index>=levels.length)throw new Error('Paired level is outside the grid.');fundWaiting(levels[k],order);
             }
           }
-        }
+        }segmentStart=point;}
       }
       if(active){const reason=cfg.tp!=null&&p>=cfg.tp?'take-profit':cfg.sl!=null&&p<=cfg.sl?'stop-loss':null;if(reason)stop(reason,t,p,i);}
-      if(i===bars.length-1&&active&&cfg.endAction==='stop')stop('end-of-test',t,p,i);
+      if(i===bars.length-1&&active&&cfg.endAction==='stop')stop('end-of-test',t,cfg.exitPriceOverride??p,i);
       const equity=fiat+btc*p;
       if(!Number.isFinite(equity)||equity<=0||fiat<-cashTolerance||btc<0)throw new Error('Account value is invalid.');
       if(reservedFiat>fiat+cashTolerance*10||reservedBTC>btc+Math.max(qty*1e-9,1e-15))throw new Error('Reservations exceed balances.');
@@ -403,7 +423,7 @@ var GridEngine = (() => {
   'use strict';
   let activeView='backtest';
   const $=id=>document.getElementById(id),ROOT='https://raw.githubusercontent.com/0xtrvkc/dynamic-btc-analytics-dashboard/main/';
-  const FILES={'1d':'btc_daily_price.json','4h':'btc_4h_price.json','1h':'btc_1h_price.json'},cache=new Map();
+  const FILES={'1d':'btc_daily_price.json','4h':'btc_4h_price.json','1h':'btc_1h_price.json','1m':null},cache=new Map();
   let dataset=null,loadedGranularity=null,mvrvData=null,mvrvError=null,adaptiveRecommendation=null,result=null,charts=[],worker=null,workerURL=null,fetchController=null,loadId=0,busy=false,loadBusy=false,dirty=false,page=0,loadTime=null;
   const usd=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}),int=new Intl.NumberFormat('en-US');
   const money=v=>v==null||!Number.isFinite(v)?'N/A':usd.format(v),pct=(v,signed=true)=>v==null||!Number.isFinite(v)?'N/A':(v>0&&signed?'+':'')+(Math.abs(v)>1e7?v.toExponential(2):v.toFixed(2))+'%',num=v=>int.format(v),iso=t=>new Date(t).toISOString(),stamp=t=>iso(t).slice(0,16).replace('T',' ');
@@ -414,7 +434,7 @@ var GridEngine = (() => {
   function updateButtons(){
     for(const control of $('config-form').querySelectorAll('input,select,button')){
       if(['run','reset','retry'].includes(control.id))continue;
-      control.disabled=busy||(['tp','sl','trigger'].includes(control.id)&&!$(control.id+'-enabled').checked)||(control.id==='reserve'&&$('strategy').value!=='binance');
+      control.disabled=busy||(['tp','sl','trigger'].includes(control.id)&&!$(control.id+'-enabled').checked)||(control.id==='reserve'&&$('strategy').value!=='binance')||(control.id==='fixed-qty'&&$('sizing-mode').value!=='fixed')||(control.id==='fill-multiplier'&&$('execution-mode').value!=='calibrated')||(control.id==='entry-override'&&!$('entry-override-enabled').checked)||(control.id==='exit-override'&&!$('exit-override-enabled').checked);
     }
     const disabled=busy||loadBusy||!dataset||loadedGranularity!==$('granularity').value;
     $('run').disabled=disabled;$('run-quick').disabled=disabled;$('retry').disabled=busy||loadBusy;$('edit-configuration').disabled=busy;
@@ -482,7 +502,16 @@ var GridEngine = (() => {
     showStatus('Adaptive recommendation applied. Review the range, then run the backtest.',true);
   }
 
-  function readConfig(){return {model:$('strategy').value,granularity:$('granularity').value,initialBalance:Number($('initial-balance').value),bottom:Number($('bottom').value),top:Number($('top').value),numGrids:Number($('num-grids').value),spacing:document.querySelector('input[name=spacing]:checked').value,feeRate:Number($('fee').value)/100,reserveRate:Number($('reserve').value)/100,riskFreeRate:Number($('risk-free').value)/100,trigger:$('trigger-enabled').checked?Number($('trigger').value):null,tp:$('tp-enabled').checked?Number($('tp').value):null,sl:$('sl-enabled').checked?Number($('sl').value):null,sellOnStop:$('sell-on-stop').checked,endAction:$('end-action').value};}
+  function readConfig(){return {model:$('strategy').value,granularity:$('granularity').value,initialBalance:Number($('initial-balance').value),bottom:Number($('bottom').value),top:Number($('top').value),numGrids:Number($('num-grids').value),spacing:document.querySelector('input[name=spacing]:checked').value,feeRate:Number($('fee').value)/100,reserveRate:Number($('reserve').value)/100,riskFreeRate:Number($('risk-free').value)/100,trigger:$('trigger-enabled').checked?Number($('trigger').value):null,tp:$('tp-enabled').checked?Number($('tp').value):null,sl:$('sl-enabled').checked?Number($('sl').value):null,sellOnStop:$('sell-on-stop').checked,endAction:$('end-action').value,executionMode:$('execution-mode').value,fillMultiplier:Number($('fill-multiplier').value)||1,fixedQty:$('sizing-mode').value==='fixed'?Number($('fixed-qty').value):null,entryPriceOverride:$('entry-override-enabled').checked?Number($('entry-override').value):null,exitPriceOverride:$('exit-override-enabled').checked?Number($('exit-override').value):null,actualGridProfit:$('actual-grid-profit').value===''?null:Number($('actual-grid-profit').value),actualCycles:$('actual-cycles').value===''?null:Number($('actual-cycles').value)};}
+
+  async function importLocalData(file){
+    if(!file)return;
+    try{
+      showStatus('Reading '+file.name+'…');const parsed=GridEngine.parseData(JSON.parse(await file.text()));
+      const gaps=parsed.bars.slice(1).map((b,i)=>b.t-parsed.bars[i].t).sort((a,b)=>a-b),median=gaps[Math.floor(gaps.length/2)],gran=median<=90000?'1m':median<=5400000?'1h':median<=18000000?'4h':'1d';
+      const item={...parsed,fetchedAt:new Date().toISOString(),local:true,sourceName:file.name};cache.set(gran,item);$('granularity').value=gran;await loadData({resetDates:true,defaults:!result,autoRun:false});showStatus('Imported '+num(item.bars.length)+' '+gran.toUpperCase()+' observations from '+file.name+'. Press Run backtest.');
+    }catch(error){showError('Could not import '+file.name+': '+error.message);showStatus('Local data import failed.',true);}
+  }
 
   function gridProfitRange(c,numGrids){
     const candidate={...c,numGrids},levels=GridEngine.geometry(candidate);
@@ -525,6 +554,7 @@ var GridEngine = (() => {
     try{
       let item=reload?null:cache.get(gran);
       if(!item){
+        if(!FILES[gran])throw new Error('Import a minute JSON file to use 1M high-fidelity mode.');
         fetchController=new AbortController();const controller=fetchController,timeout=setTimeout(()=>controller.abort(),35000);
         try{const response=await fetch(ROOT+FILES[gran],{signal:controller.signal,cache:reload?'reload':'default'});if(!response.ok)throw new Error('Price request returned HTTP '+response.status+'.');item={...GridEngine.parseData(await response.json()),fetchedAt:new Date().toISOString()};cache.set(gran,item);}
         finally{clearTimeout(timeout);}
@@ -537,7 +567,7 @@ var GridEngine = (() => {
         const converted=gran==='1d'?old.slice(0,10):old.length===10?old+'T00:00':old;
         input.value=!resetDates&&converted?(converted<input.min?input.min:converted>input.max?input.max:converted):picker(name==='start-date'?Math.max(first,last-365*GridEngine.DAY):last,gran);
       }
-      set('coverage',num(item.bars.length)+' bars · '+stamp(first)+' → '+stamp(last)+' UTC');
+      set('coverage',num(item.bars.length)+' bars · '+stamp(first)+' → '+stamp(last)+' UTC'+(item.local?' · local '+item.sourceName:''));
       if(defaults)centerRange();else updatePreview();updateAdaptivePreview();
       showStatus((result?'Data ready — press Run backtest to use these inputs.':'Data ready. Configure the grid or run the default setup.')+(item.invalid?' '+num(item.invalid)+' invalid observations excluded.':''),!!result);
       loadBusy=false;updateButtons();if(autoRun)await run();
@@ -549,7 +579,7 @@ var GridEngine = (() => {
   function validate(){
     $('error').hidden=true;for(const input of document.querySelectorAll('[aria-invalid]'))input.removeAttribute('aria-invalid');
     if(!dataset||loadedGranularity!==$('granularity').value)throw new Error('Wait for the selected price file to finish loading.');
-    const ids=['start-date','end-date','initial-balance','bottom','top','num-grids','fee','risk-free',...($('strategy').value==='binance'?['reserve']:[]),...['tp','sl','trigger'].filter(id=>$(id+'-enabled').checked)];
+    const ids=['start-date','end-date','initial-balance','bottom','top','num-grids','fee','risk-free',...($('strategy').value==='binance'?['reserve']:[]),...['tp','sl','trigger'].filter(id=>$(id+'-enabled').checked),...($('sizing-mode').value==='fixed'?['fixed-qty']:[]),...['entry-override','exit-override'].filter(id=>$(id+'-enabled').checked),...($('execution-mode').value==='calibrated'?['fill-multiplier']:[]),...['actual-grid-profit','actual-cycles'].filter(id=>$(id).value!=='')];
     for(const id of ids){const el=$(id);if(!el.value||!el.checkValidity()){$('configuration').open=true;el.setAttribute('aria-invalid','true');el.focus();throw new Error('Check '+(el.labels?.[0]?.textContent||el.getAttribute('aria-label')||id).trim()+'. Use a value within its limits.');}}
     const start=inputTime('start-date'),end=inputTime('end-date',true);if(!Number.isFinite(start)||!Number.isFinite(end)||start>end)throw new Error('The start must not be after the end.');
     const bars=selectedBars();if(bars.length<2)throw new Error('Select at least two observed bars.');const cfg=readConfig();GridEngine.validateConfig(cfg,bars[0].p);return {bars,cfg};
@@ -572,11 +602,11 @@ var GridEngine = (() => {
   async function digest(bars){try{if(!window.crypto?.subtle)return null;const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(JSON.stringify(bars)));return [...new Uint8Array(hash)].map(x=>x.toString(16).padStart(2,'0')).join('');}catch{return null;}}
   async function run(){
     if(busy||loadBusy)return;let input;try{input=validate();}catch(error){$('configuration').open=true;showError(error.message);return;}
-    busy=true;updateButtons();$('run').textContent='Running…';$('progress').hidden=false;$('progress-bar').style.width='0%';showStatus('Simulating '+num(input.bars.length)+' closes and calculating the quant report…');
+    busy=true;updateButtons();$('run').textContent='Running…';$('progress').hidden=false;$('progress-bar').style.width='0%';showStatus('Simulating '+num(input.bars.length)+' observations and calculating the quant report…');
     const started=performance.now(),currentLoad=loadId;
     try{
       const [computed,hash]=await Promise.all([compute(input.bars,input.cfg),digest(input.bars)]);if(currentLoad!==loadId)return;
-      computed.dataInfo={url:ROOT+FILES[input.cfg.granularity],fetchedAt:loadTime,fullCount:dataset.bars.length,first:iso(dataset.bars[0].t),last:iso(dataset.bars.at(-1).t),invalid:dataset.invalid,duplicates:dataset.duplicates,selectedCount:input.bars.length,selectedSHA256:hash};
+      computed.dataInfo={url:dataset.local?null:ROOT+FILES[input.cfg.granularity],source:dataset.local?dataset.sourceName:FILES[input.cfg.granularity],local:!!dataset.local,fetchedAt:loadTime,fullCount:dataset.bars.length,first:iso(dataset.bars[0].t),last:iso(dataset.bars.at(-1).t),invalid:dataset.invalid,duplicates:dataset.duplicates,selectedCount:input.bars.length,selectedSHA256:hash,hasOHLC:input.bars.some(b=>b.hasOHLC)};
       computed.requestedPeriod={start:$('start-date').value,end:$('end-date').value};computed.ranAt=new Date().toISOString();result=computed;dirty=false;page=0;
       renderResults();renderLog();$('configuration').open=false;showStatus('Complete · '+num(result.rows.length)+' bars · '+num(result.trades.length)+' fills · '+num(result.matches.length)+' matched pairs · '+((performance.now()-started)/1000).toFixed(2)+'s');
       for(const id of ['export-trades','export-config','export-matches'])$(id).disabled=false;
@@ -595,11 +625,26 @@ var GridEngine = (() => {
     set('price-foot',r.levels.length+' prices · midpoint '+money(r.center)+' · '+(r.activation?btcFmt(r.qty)+' BTC/order':'no in-range activation'));
     set('trades-count',s.buys+' buys / '+s.sells+' sells');set('equity-foot','Total P&L '+money(s.pnl)+' = fiat '+money(s.fiat)+' + BTC '+money(s.btc*r.rows.at(-1).p)+' − initial '+money(r.config.initialBalance));
     set('cycle-summary',s.matchedPairs+' pairs · average '+money(s.averageCycle)+' · '+pct(s.cycleWinRate,false)+' winners. Closed pairs exclude open BTC losses.');
+    renderFidelityAudit();
     set('annualization-note',daysText(s.days)+' evaluation · '+daysText(s.botDays)+' bot lifetime · APY is hypothetical.');set('exposure-note','Time-weighted average exposure '+pct(s.averageExposure,false)+' · in-range share of running time '+pct(s.inRangePct,false)+'.');
     const notes=[];if(!r.activation)notes.push(r.config.trigger!=null&&!r.triggered?'Entry trigger was never crossed. Capital stayed in cash.':'No in-range close was available for activation. Capital stayed in cash.');
     if(r.exit&&r.exit.reason!=='end-of-test')notes.push(r.exit.reason+' at '+money(r.exit.price)+' on '+stamp(r.exit.t)+' UTC; '+(r.exit.liquidated?'BTC sold, then held cash.':'BTC retained and marked through the selected end.'));
     if(r.skipped)notes.push(r.skipped+' unfunded crossings skipped.');if(r.missing)notes.push(r.missing+' nominal intervals missing; close crossings span those gaps.');if(r.dataInfo.invalid)notes.push(r.dataInfo.invalid+' invalid price records excluded.');if(s.days<30)notes.push('Under 30 elapsed days: annualized rates and risk estimates are sensitive to the short sample.');
     $('run-notes').hidden=!notes.length;set('run-notes',notes.join(' '));renderQuant();renderCalendar();renderEpisodes();renderLadder();renderCharts();
+  }
+
+  function renderFidelityAudit(){
+    const r=result,c=r.config,s=r.stats,mult=c.executionMode==='calibrated'?c.fillMultiplier:1,adjusted=s.gridProfit*mult,actualCycles=c.actualCycles,actualProfit=c.actualGridProfit;
+    const method=c.granularity==='1m'?'1M high fidelity':c.executionMode==='ohlc'?(r.dataInfo.hasOHLC?'OHLC estimated path':'OHLC requested · close-only source'):c.executionMode==='calibrated'?'Close-only calibrated sensitivity':'Close-only conservative';
+    set('fidelity-method',method+(c.fixedQty!=null?' · fixed '+btcFmt(c.fixedQty)+' BTC':' · auto-sized'));
+    set('fidelity-cycles',num(s.matchedPairs));set('fidelity-adjusted',money(adjusted)+(mult!==1?' · '+mult.toFixed(2)+'× sensitivity':' · unadjusted'));
+    set('fidelity-capture',actualCycles!=null&&actualCycles>0?(s.matchedPairs/actualCycles*100).toFixed(1)+'% · '+s.matchedPairs+' / '+actualCycles:'Not supplied');
+    if(actualProfit!=null){const error=s.gridProfit-actualProfit;set('fidelity-error',money(error)+' · '+(actualProfit?((error/Math.abs(actualProfit))*100).toFixed(1)+'%':'percentage N/A'));tone('fidelity-error',-Math.abs(error));}else{set('fidelity-error','Not supplied');$('fidelity-error').classList.remove('positive','negative');}
+    let driver='No exchange benchmark supplied';
+    if(actualCycles!=null&&actualCycles>s.matchedPairs*1.2)driver='Likely missed intrabar crossings';else if(c.executionMode==='ohlc'&&!r.dataInfo.hasOHLC)driver='OHLC source required';else if(c.fixedQty==null)driver='Auto quantity may differ from exchange';else if(c.entryPriceOverride==null||c.exitPriceOverride==null)driver='Observed and exchange execution prices may differ';else if(actualProfit!=null)driver='Fees, rounding, queue priority or price source';
+    set('fidelity-driver',driver);
+    set('fidelity-note',(c.executionMode==='calibrated'?'The adjusted figure is a sensitivity estimate only; simulated fills, balances, ROI and drawdown remain unchanged. ':'')+(c.executionMode==='ohlc'?'The intrabar order is deterministic but unknowable from OHLC alone; use minute data when available. ':'')+'Exchange values are optional and never influence the backtest.');
+    $('model-note').innerHTML='<strong>'+method+'.</strong> '+(c.granularity==='1m'?'Minute observations reduce missed intrabar reversals but still do not model exchange liquidity or queue priority.':c.executionMode==='ohlc'?'Intrabar extrema are used with an assumed path; tick order, spread and liquidity remain unknown.':'Fills are inferred from grid lines crossed between observed closes; intrabar reversals remain invisible.')+' Seed and final executions '+(c.entryPriceOverride!=null||c.exitPriceOverride!=null?'use enabled exact-price overrides where supplied.':'use observed prices.');
   }
 
   function palette(){const style=getComputedStyle(document.documentElement);return Object.fromEntries(['text','muted','border','surface','surface2','accent','teal','green','red','amber','bg'].map(k=>[k,style.getPropertyValue('--'+k).trim()]));}
@@ -687,14 +732,14 @@ var GridEngine = (() => {
   function exportConfig(){
     if(!result)return;const r=result,c=r.config;
     const output={sandbox_version:'2.0',ran_at:r.ranAt,config:{exchange:{name:'historical_close_simulation',trading_fee:c.feeRate,trading_mode:'backtest'},pair:{base_currency:'BTC',quote_currency:'USD'},trading_settings:{timeframe:c.granularity,period:{start_date:iso(r.rows[0].t),end_date:iso(r.rows.at(-1).t)},initial_balance:c.initialBalance},grid_strategy:{type:'simple_grid',model:c.model,spacing:c.spacing,num_grids:c.numGrids,count_convention:c.model==='binance'?'intervals':'price_levels',level_count:r.levels.length,range:{top:c.top,bottom:c.bottom},cash_buffer:c.reserveRate,trigger_price:c.trigger},risk_management:{take_profit:{enabled:c.tp!=null,threshold:c.tp},stop_loss:{enabled:c.sl!=null,threshold:c.sl},sell_all_btc_on_stop:c.sellOnStop,end_of_test:c.endAction},analytics:{risk_free_rate:c.riskFreeRate,apy_compounding_periods:365}},requested_period:r.requestedPeriod,data:r.dataInfo,
-      assumptions:{execution:'Close crossings at grid levels; seed and stops at observed closes; no OHLCV, spread or slippage.',fees:'USD per fill; exchange fee-token conversion and lot-size rounding not simulated.',order_quantity:r.qty,grid_profit:'Adjacent grid buy/sell pairs less both fees; seed sales and stop liquidations excluded.',floating_other:'Total P&L minus matched grid profit; includes unmatched and inventory effects.',realized:'Weighted average cost including entry fees; separate accounting lens.',total_apr:'Full-window simple annualization',bot_apr:'Account P&L at stop / capital / elapsed bot lifetime',cagr:'Observed start/end equity annualized',apy:'Hypothetical daily compounding of total APR; not simulated',daily_stats:'Last observed equity per UTC day; adjacent days only',legacy_ratios:'Original per-bar analyzer convention at 3% risk-free'},stats:r.stats,quant_summary:r.quantSummary,activation:r.activation,exit:r.exit,missing_intervals:r.missing,unfunded_crossings:r.skipped,open_orders:r.openOrders,reserved_fiat:r.reservedFiat,reserved_btc:r.reservedBTC,levels:r.levels,initial_orders:r.initialOrders,monthly:r.analytics.monthly,drawdown_episodes:r.analytics.episodes};
+      assumptions:{execution_mode:c.executionMode,execution:c.executionMode==='ohlc'?'Deterministic intrabar OHLC path; true tick order remains unknown.':'Close crossings at grid levels.',entry_price_override:c.entryPriceOverride,exit_price_override:c.exitPriceOverride,fill_multiplier_reporting_only:c.fillMultiplier,fixed_order_quantity:c.fixedQty,fees:'USD per fill; exchange fee-token conversion, spread, queue priority and lot-size rounding not simulated.',order_quantity:r.qty,grid_profit:'Adjacent grid buy/sell pairs less both fees; seed sales and stop liquidations excluded.',floating_other:'Total P&L minus matched grid profit; includes unmatched and inventory effects.',realized:'Weighted average cost including entry fees; separate accounting lens.',total_apr:'Full-window simple annualization',bot_apr:'Account P&L at stop / capital / elapsed bot lifetime',cagr:'Observed start/end equity annualized',apy:'Hypothetical daily compounding of total APR; not simulated',daily_stats:'Last observed equity per UTC day; adjacent days only',legacy_ratios:'Original per-bar analyzer convention at 3% risk-free'},exchange_comparison:{grid_profit:c.actualGridProfit,matched_cycles:c.actualCycles},stats:r.stats,quant_summary:r.quantSummary,activation:r.activation,exit:r.exit,missing_intervals:r.missing,unfunded_crossings:r.skipped,open_orders:r.openOrders,reserved_fiat:r.reservedFiat,reserved_btc:r.reservedBTC,levels:r.levels,initial_orders:r.initialOrders,monthly:r.analytics.monthly,drawdown_episodes:r.analytics.episodes};
     download('btc-grid-run.json',JSON.stringify(output,null,2),'application/json');
   }
 
   function exportTrades(){if(!result)return;const rows=[['side','timestamp_utc','price_usd','quantity_btc','grid_level','cycle','kind','fee_usd','running_pnl_usd','cumulative_realized_pnl_usd','fiat_balance_usd','btc_balance','matched_profit_usd','cumulative_grid_profit_usd'],...result.trades.map(t=>[t.side,iso(t.t),t.price,t.qty,t.level??'',t.cycle??'',t.kind,t.fee,t.pnl,t.realized,t.fiat,t.btc,t.matchedProfit??'',t.gridProfit])];download('btc-grid-trades.csv',rows.map(row=>row.join(',')).join('\r\n'),'text/csv;charset=utf-8');}
 
   async function reset(){
-    ++loadId;stopWorker();if(fetchController)fetchController.abort();busy=false;loadBusy=false;result=null;dirty=false;page=0;destroyCharts();$('config-form').reset();$('granularity').value='4h';$('strategy').value='binance';for(const k of ['tp','sl','trigger'])$(k).disabled=true;$('run').textContent='▶ Run backtest';$('progress').hidden=true;$('results').hidden=true;$('empty').hidden=false;$('error').hidden=true;$('configuration').open=false;$('chart-window').value='all';$('side-filter').value='all';$('pnl-lens').value='grid';$('pnl-unit').value='usd';for(const id of ['export-trades','export-config','export-matches'])$(id).disabled=true;set('log-meta','Run a backtest to inspect fills.');renderLog();switchView('backtest');await loadData({resetDates:true,defaults:true,autoRun:true});
+    ++loadId;stopWorker();if(fetchController)fetchController.abort();for(const [key,value] of cache)if(value.local)cache.delete(key);busy=false;loadBusy=false;result=null;dirty=false;page=0;destroyCharts();$('config-form').reset();$('local-data').value='';$('granularity').value='4h';$('strategy').value='binance';for(const k of ['tp','sl','trigger','fixed-qty','fill-multiplier','entry-override','exit-override'])$(k).disabled=true;$('run').textContent='▶ Run backtest';$('progress').hidden=true;$('results').hidden=true;$('empty').hidden=false;$('error').hidden=true;$('configuration').open=false;$('chart-window').value='all';$('side-filter').value='all';$('pnl-lens').value='grid';$('pnl-unit').value='usd';for(const id of ['export-trades','export-config','export-matches'])$(id).disabled=true;set('log-meta','Run a backtest to inspect fills.');renderLog();switchView('backtest');await loadData({resetDates:true,defaults:true,autoRun:true});
   }
 
   function formatRatio(v,infinite=false){return infinite?'∞':v==null||!Number.isFinite(v)?'N/A':v.toFixed(2);}
@@ -764,6 +809,9 @@ var GridEngine = (() => {
     $('config-form').addEventListener('submit',e=>{e.preventDefault();run();});$('target-profit-grid').addEventListener('input',()=>{syncGridsToProfitTarget();markDirty();});$('config-form').addEventListener('input',e=>{if(e.target.id!=='target-profit-grid')markDirty();if(['start-date','end-date','granularity'].includes(e.target.id))updateAdaptivePreview();});
     for(const mode of document.querySelectorAll('input[name=setup-mode]'))mode.addEventListener('change',()=>{updateAdaptivePreview();markDirty();});$('apply-adaptive').addEventListener('click',applyAdaptive);
     $('strategy').addEventListener('change',()=>{$('end-action').value=$('strategy').value==='binance'?'stop':'mark';updateButtons();markDirty();});
+    $('execution-mode').addEventListener('change',()=>{updateButtons();markDirty();});$('sizing-mode').addEventListener('change',()=>{updateButtons();markDirty();});
+    for(const side of ['entry-override','exit-override'])$(side+'-enabled').addEventListener('change',()=>{updateButtons();markDirty();});
+    $('local-data').addEventListener('change',e=>importLocalData(e.target.files?.[0]));
     $('granularity').addEventListener('change',()=>{dirty=!!result;loadData();});$('retry').addEventListener('click',()=>loadData({reload:true,defaults:!result&&!$('bottom').value,autoRun:!result}));
     for(const button of document.querySelectorAll('[data-period]'))button.addEventListener('click',()=>setPeriod(button.dataset.period));for(const side of ['tp','sl','trigger'])$(side+'-enabled').addEventListener('change',()=>{$(side).disabled=!$(side+'-enabled').checked;markDirty();});
     $('center-range').addEventListener('click',centerRange);$('reset').addEventListener('click',reset);for(const id of ['chart-window','pnl-lens','pnl-unit'])$(id).addEventListener('change',renderCharts);

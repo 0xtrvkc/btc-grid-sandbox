@@ -430,7 +430,7 @@ var GridEngine = (() => {
   function gridProfitRange(c,numGrids){
     const candidate={...c,numGrids},levels=GridEngine.geometry(candidate);
     const profits=levels.slice(1).map((p,i)=>(p*(1-c.feeRate)-levels[i]*(1+c.feeRate))/levels[i]*100);
-    return {levels,lo:Math.min(...profits),hi:Math.max(...profits),average:mean(profits)};
+    return {levels,lo:Math.min(...profits),hi:Math.max(...profits),average:profits.reduce((sum,value)=>sum+value,0)/profits.length};
   }
 
   function syncGridsToProfitTarget(){

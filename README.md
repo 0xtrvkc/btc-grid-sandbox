@@ -13,6 +13,8 @@ A browser-only BTC spot-grid backtester in one `index.html`. Download it and ope
 5. Press **Run backtest**. Input changes take effect on the next run. **Reset** restores the default configuration and runs it again.
 6. Inspect **Overview**, **Profit lab**, **Risk & drawdown**, **Quant summary** and **Execution log**. Use the exports to save the run, fills, matched pairs or summary.
 
+**Follow latest · rolling 1Y** is enabled by default. Whenever the page loads or **Fetch newest** is pressed, the date window ends at the newest candle in the source file and moves its start to one year earlier. Editing either date turns this off so a historical study cannot silently move. The coverage line reports excluded invalid rows, replaced duplicate timestamps, and warns when the upstream source is stale.
+
 **Grid intervals and Net Profit / Grid are linked in both directions.** Editing the profit target solves for the nearest valid integer interval count. Editing the interval count recalculates the achievable average net profit after both fill fees. Range, fee, spacing and model changes preserve whichever of those two controls you edited last.
 
 ### Cash-flow-first overview
@@ -88,7 +90,7 @@ Changing the date range does not automatically recenter an existing grid. Use **
 - **Execution log:** paginated fills, matched-pair filtering, order ladder, fill and matched-pair CSVs, a run JSON and summary TXT.
 - **Methodology:** formulas, assumptions and source references.
 
-Dark and light themes, window-style chrome, keyboard controls and a navigation dropdown below 800px. The default view runs the latest available year of 4-hour data; it is an example configuration, not an optimized strategy.
+Dark and light themes, window-style chrome, keyboard controls and a navigation dropdown below 800px. The default view runs the latest available year of 1-hour data; it is an example configuration, not an optimized strategy.
 
 ## Grid conventions
 
@@ -152,6 +154,8 @@ The scorecard also includes daily win rate, best and worst day, longest losing-d
 ## Data and execution limits
 
 Prices are fetched directly from [dynamic-btc-analytics-dashboard](https://github.com/0xtrvkc/dynamic-btc-analytics-dashboard): `btc_daily_price.json`, `btc_4h_price.json` or `btc_1h_price.json`. The flat `{date: close}` data are sorted and interpreted in UTC; each picker is bounded to the loaded file's actual coverage.
+
+The sandbox is future-data compatible, not a live exchange feed. New candles become available only after those source files are updated. **Fetch newest** bypasses the browser cache; with **Follow latest** enabled, the rolling one-year window advances to the newest loaded candle. A stale-source warning prevents an old dataset from looking current. Duplicate timestamps use the last supplied observation and are disclosed in the coverage line.
 
 Adaptive setup additionally requests `mvrv.json` from that repository. If it is unavailable, price-only backtests and manual configuration continue to work; the adaptive readout reports MVRV as unavailable rather than substituting a future or fabricated value.
 

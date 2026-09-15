@@ -13,6 +13,23 @@ A browser-only BTC spot-grid backtester in one `index.html`. Download it and ope
 5. Press **Run backtest**. Input changes take effect on the next run. **Reset** restores the default configuration and runs it again.
 6. Inspect **Overview**, **Profit lab**, **Risk & drawdown**, **Quant summary** and **Execution log**. Use the exports to save the run, fills, matched pairs or summary.
 
+### Cash-flow-first overview
+
+The first result block separates the grid engine's realized cash flow from the marked account value. A grid can harvest profitable buy→sell cycles while its remaining BTC inventory is underwater, so the dashboard presents both without allowing one to hide the other.
+
+The cash-flow cockpit includes:
+
+- net matched grid cash flow and realized Grid ROI;
+- simple Grid APR and a clearly labelled hypothetical Grid APY scenario;
+- observed cash flow per bot day and a normalized 30-day run rate;
+- completed matched-pair velocity and average net profit per pair;
+- gross matched spread, matched-pair fees, fee share and gross-profit retention;
+- positive cash-flow months, best/worst cash-flow month and top-month concentration;
+- annualized gross grid edge, working/in-range time and constant-pace capital payback;
+- a direct reconciliation: grid cash flow + floating/other P&L = total account P&L.
+
+APR and run rates normalize the observed historical period. APY assumes daily reinvestment that the fixed-order-size engine does not simulate. Capital payback holds the observed cash-flow pace constant and is not a forecast.
+
 ### Execution fidelity and exchange reconciliation
 
 The simulator provides three explicit execution modes:
@@ -60,7 +77,7 @@ Changing the date range does not automatically recenter an existing grid. Use **
 
 ## Research views
 
-- **Overview:** net ROI beside buy & hold, matched grid profit, maximum drawdown, APR, CAGR, Sharpe, fees and balances; equity, price/fill and underwater charts.
+- **Overview:** cash-flow-first grid economics, followed by account/inventory reality; net ROI beside buy & hold, maximum drawdown, APR, CAGR, Sharpe, fees and balances; equity, price/fill and underwater charts.
 - **Execution fidelity audit:** data resolution, simulated cycles, calibrated sensitivity, exchange fill capture, profit error and discrepancy attribution.
 - **Profit lab:** grid and bot APR, hypothetical APY, two P&L attribution lenses, a waterfall, profit by interval, monthly return map and daily return distribution.
 - **Risk:** drawdown depth and duration, recovery needed, BTC exposure, Calmar, Sortino, volatility, Ulcer Index, historical daily VaR/expected shortfall and recovery episodes.
@@ -94,6 +111,12 @@ The **Original simple · v1** option retains the [grid_trading_bot-inspired](htt
 | Total APR | Full-window ROI × 365 / elapsed calendar days |
 | Bot APR | P&L at bot stop / starting capital × 365 / elapsed days since activation |
 | Grid APR | Net matched profit / starting capital × 365 / bot duration |
+| Grid APY scenario | `(1 + Grid APR / 365)^365 − 1`; hypothetical daily reinvestment, not simulated |
+| Daily grid cash flow | Net matched grid profit / bot duration |
+| Normalized 30-day cash flow | Daily grid cash flow × 30.4375 |
+| Pair velocity | Completed matched pairs / bot duration |
+| Gross-profit retention | Net matched grid profit / gross matched spread |
+| Capital payback | Starting capital / positive observed daily grid cash flow; constant-pace scenario |
 | CAGR | `(final equity / starting capital)^(365 / elapsed days) − 1` |
 | APY scenario | `(1 + total APR / 365)^365 − 1`, using APR as a decimal; hypothetical daily reinvestment, not a simulated return |
 | Daily Sharpe / Sortino | Adjacent UTC daily-close excess returns; sample standard deviation / downside RMS; annualization factor √365 |

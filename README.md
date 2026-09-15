@@ -13,6 +13,20 @@ A browser-only BTC spot-grid backtester in one `index.html`. Download it and ope
 5. Press **Run backtest**. Input changes take effect on the next run. **Reset** restores the default configuration and runs it again.
 6. Inspect **Overview**, **Profit lab**, **Risk & drawdown**, **Quant summary** and **Execution log**. Use the exports to save the run, fills, matched pairs or summary.
 
+### Adaptive quant setup
+
+The configuration now includes an optional **Adaptive** setup assistant. It combines the selected price file with `mvrv.json` from the companion analytics repository and proposes a grid as of the selected backtest start:
+
+- trailing 90-day log-return volatility sizes a 30-day expected-move range;
+- 30-day and 90-day price momentum, plus directional efficiency, classify trend pressure and grid suitability;
+- the latest MVRV value and its trailing 365-day Z-score classify accumulation or distribution conditions and skew the range;
+- per-bar volatility proposes a fee-aware target net profit per grid, which is converted to the nearest valid integer interval count;
+- the recommendation also proposes a cash buffer and geometric spacing.
+
+Select **Adaptive**, inspect the five-signal readout, and choose **Apply recommendation**. Nothing is changed until that button is pressed, and every field remains editable afterward. Manual mode remains the default and the adaptive setup does not alter the simulation engine.
+
+The cutoff is strict: price and MVRV observations must be timestamped at or before the first selected test observation. Later data cannot influence a historical recommendation. This is a point-in-time setup assistant, not a claim that the suggested parameters maximize future profit and not a dynamic live rebalancing bot.
+
 ### Default configuration
 
 | Setting | Default |
@@ -25,6 +39,7 @@ A browser-only BTC spot-grid backtester in one `index.html`. Download it and ope
 | Spacing | Arithmetic |
 | Trading fee | 0.1% on every fill, including seed and liquidation |
 | Cash buffer | 1% |
+| Setup assistant | Manual; Adaptive is optional |
 | Entry trigger / TP / SL | Disabled |
 | End of test | Stop bot and sell all remaining BTC |
 | Annual risk-free rate | 3% for daily risk-adjusted metrics |
@@ -98,6 +113,8 @@ The scorecard also includes daily win rate, best and worst day, longest losing-d
 ## Data and execution limits
 
 Prices are fetched directly from [dynamic-btc-analytics-dashboard](https://github.com/0xtrvkc/dynamic-btc-analytics-dashboard): `btc_daily_price.json`, `btc_4h_price.json` or `btc_1h_price.json`. The flat `{date: close}` data are sorted and interpreted in UTC; each picker is bounded to the loaded file's actual coverage.
+
+Adaptive setup additionally requests `mvrv.json` from that repository. If it is unavailable, price-only backtests and manual configuration continue to work; the adaptive readout reports MVRV as unavailable rather than substituting a future or fabricated value.
 
 There are no candles, volume or intrabar paths. A fill is simulated when consecutive closes cross an active grid boundary, at that boundary's price; multiple crossed levels execute in price order. Seed purchases and risk exits execute at an observed close. Stops are evaluated at the close after crossed grid orders. Out-of-range activity resumes when closes return to the range. Spread, slippage, exchange queue priority and tick-accurate execution are not modeled.
 

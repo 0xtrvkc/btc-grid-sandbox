@@ -63,16 +63,17 @@ The cutoff is strict: price and MVRV observations must be timestamped at or befo
 | Setting | Default |
 | --- | --- |
 | Execution model | Binance-style spot |
-| Data | 4-hour closes; latest available 365 days |
-| Investment | $10,000 |
+| Data | 1-hour closes; latest available 365 days |
+| Investment | $1,000 |
 | Range | First selected close ±20%, rounded for the input controls |
-| Grid count | 20 intervals / 21 price levels |
+| Net profit / grid target | 0.50% after both fill fees |
+| Grid count | Automatically solved to the nearest valid integer interval count |
 | Spacing | Arithmetic |
 | Trading fee | 0.1% on every fill, including seed and liquidation |
 | Cash buffer | 1% |
 | Setup assistant | Manual; Adaptive is optional |
 | Entry trigger / TP / SL | Disabled |
-| End of test | Stop bot and sell all remaining BTC |
+| End of test | Keep open and mark remaining BTC to market |
 | Annual risk-free rate | 3% for daily risk-adjusted metrics |
 
 Changing the date range does not automatically recenter an existing grid. Use **Center on first close ±20%** when that is the intended setup. Data coverage comes from the selected file and can differ between granularities.

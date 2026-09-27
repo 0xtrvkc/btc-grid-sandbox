@@ -85,12 +85,15 @@ Changing the date range does not automatically recenter an existing grid. Use **
 - **Overview:** cash-flow-first grid economics, followed by account/inventory reality; net ROI beside buy & hold, maximum drawdown, APR, CAGR, Sharpe, fees and balances; equity, price/fill and underwater charts.
 - **Execution fidelity audit:** data resolution, simulated cycles, calibrated sensitivity, exchange fill capture, profit error and discrepancy attribution.
 - **Profit lab:** grid and bot APR, hypothetical APY, two P&L attribution lenses, a waterfall, profit by interval, monthly return map and daily return distribution.
+- **Halving-cycle return map (Profit lab):** choose 1, 2, 3, 4, 6 or 12 calendar months from the four confirmed halving dates used by the companion analytics dashboard. Each cell shows BTC's observed return over the part of that window covered by the *current grid run*. Select it to inspect the same slice's grid cash flow, full account return, floating/other change, completed pairs, fees and in-range observations. This highlights windows when matched grid cash flow is positive but the overall account loses value. A dot marks a partly observed window; cells outside the selected run are blank. The Run JSON includes the selected window size and window records.
 - **Risk:** drawdown depth and duration, recovery needed, BTC exposure, Calmar, Sortino, volatility, Ulcer Index, historical daily VaR/expected shortfall and recovery episodes.
 - **Quant summary:** a deterministic narrative from the actual run, rolling returns, BTC beta/correlation and a detailed scorecard. No external AI service.
 - **Execution log:** paginated fills, matched-pair filtering, order ladder, fill and matched-pair CSVs, a run JSON and summary TXT.
 - **Methodology:** formulas, assumptions and source references.
 
 Dark and light themes, window-style chrome, keyboard controls and a navigation dropdown below 800px. The default view runs the latest available year of 1-hour data; it is an example configuration, not an optimized strategy.
+
+Cycle-window returns are measured from the first to the last observed bar inside each UTC window, using the same cumulative grid simulation. They are not hypothetical fresh grid launches at every halving or a comparison with complete historical cycle returns when the selected backtest covers only part of a window. Confirmed halving origins are fixed at 2012-11-28, 2016-07-09, 2020-05-11 and 2024-04-20; a future estimated date never closes the live cycle.
 
 ## Grid conventions
 

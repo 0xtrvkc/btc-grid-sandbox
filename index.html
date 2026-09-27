@@ -27,6 +27,9 @@
 .notice input[type=file]{display:inline-block;width:auto;max-width:100%;min-height:34px;margin-left:10px;padding:4px;font-size:11px;background:var(--bg)}.notice input[type=file]::file-selector-button{border:1px solid var(--border);border-radius:3px;background:var(--surface2);color:var(--text);padding:5px 9px;margin-right:8px;cursor:pointer}@media(max-width:620px){.notice input[type=file]{display:block;width:100%;margin:9px 0 0}.scorecard-row{gap:10px}.scorecard-row strong{max-width:55%;white-space:normal}}
 .cashflow-first{border:1px solid var(--border);border-top:3px solid var(--green);border-radius:5px;background:linear-gradient(130deg,color-mix(in srgb,var(--green) 7%,var(--surface)),var(--surface));padding:18px;margin-bottom:14px}.cashflow-head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:14px}.cashflow-head h2{font-size:18px;letter-spacing:-.025em}.cashflow-head p{font-size:11px;color:var(--muted);margin:3px 0 0}.cashflow-state{font:600 10px ui-monospace,monospace;padding:5px 8px;border:1px solid currentColor;border-radius:3px;white-space:nowrap}.cashflow-first .g4{margin-bottom:10px}.cashflow-first .stat{background:color-mix(in srgb,var(--surface) 83%,transparent);padding:14px}.cashflow-first .stat-val{font-size:clamp(22px,2vw,31px)}.cashflow-first .metric-strip{margin:0;background:color-mix(in srgb,var(--surface) 70%,transparent)}.cashflow-context{margin:10px 0 0;font-size:11px;color:var(--muted)}.cashflow-context strong{color:var(--text);font-weight:550}@media(max-width:620px){.cashflow-first{padding:14px}.cashflow-head{flex-direction:column;gap:8px}.cashflow-first .metric-strip{grid-template-columns:1fr 1fr}.cashflow-first .metric-strip>div{padding:0 10px}.cashflow-first .metric-strip strong{font-size:18px}}
 
+/* Cycle windows share the UTC calendar-month convention of the BTC dashboard. */
+.cycle-controls{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0 14px}.cycle-controls button{min-height:32px;padding:5px 9px;font-size:11px}.cycle-controls button[aria-pressed=true]{color:var(--accent);border-color:var(--accent)}
+.cycle-map{width:max-content;min-width:100%;border-collapse:separate;border-spacing:3px}.cycle-map th,.cycle-map td{text-align:center;padding:5px;min-width:79px}.cycle-map th:first-child{text-align:left;position:sticky;left:0;background:var(--surface2);z-index:1;min-width:124px}.cycle-map button{min-height:49px;width:100%;border:1px solid var(--border);padding:4px;font:11px ui-monospace,monospace}.cycle-map button.selected{border-color:var(--accent);outline:1px solid var(--accent)}.cycle-map button small{display:block;font-size:9px;color:var(--muted)}.cycle-map .no-window{color:var(--muted)}.cycle-detail{border-top:1px solid var(--border);padding-top:12px;margin-top:10px;font-size:12px;line-height:1.7;color:var(--muted)}.cycle-detail strong{color:var(--text)}
 </style>
 </head>
 <body>
@@ -128,6 +131,7 @@
           <article class="chart-card"><div class="chart-header"><div><div class="chart-title">P&amp;L through time</div><div class="small muted" id="pnl-lens-note">Net matched profit + floating / other P&amp;L = total P&amp;L.</div></div><div class="chart-tools"><label for="pnl-lens">Attribution</label><select id="pnl-lens"><option value="grid">Grid + floating / other</option><option value="inventory">Realized + unrealized</option></select><label for="pnl-unit">Unit</label><select id="pnl-unit"><option value="usd">USD</option><option value="pct">% of capital</option></select></div></div><div class="chart-wrap medium"><canvas id="pnl-chart" role="img" aria-label="Cumulative profit and loss with component attribution"></canvas></div></article>
           <div class="two-col"><article class="chart-card"><div class="chart-header"><div class="chart-title">P&amp;L bridge <span>USD</span></div></div><div class="chart-wrap medium"><canvas id="bridge-chart" role="img" aria-label="Waterfall from gross matched spread and other price effects through fees to net P&L"></canvas></div><div class="chart-foot">Gross matched spread + other price P&amp;L − all fees = net P&amp;L.</div></article><article class="chart-card"><div class="chart-header"><div class="chart-title">Profit by grid interval <span>NET MATCHED P&amp;L</span></div></div><div class="chart-wrap medium"><canvas id="grid-profit-chart" role="img" aria-label="Matched profit for each grid interval"></canvas></div><div class="chart-foot" id="cycle-summary">No completed pairs yet.</div></article></div>
           <article class="chart-card"><div class="chart-header"><div><div class="chart-title">Monthly return map <span>NET EQUITY RETURN</span></div><div class="small muted">Hover or tap a cell for P&amp;L, matched profit and fees. A dot marks a partial month.</div></div><div class="legend"><span class="negative">Loss</span><span class="muted">0</span><span class="positive">Gain</span></div></div><div class="heatmap-scroll"><table class="heatmap" id="monthly-map" aria-label="Calendar monthly returns"></table></div><div class="chart-foot" id="month-detail">Select a month to inspect it.</div></article>
+          <article class="chart-card"><div class="chart-header"><div><div class="chart-title">Halving-cycle return map <span>BTC PATH × GRID OUTCOME</span></div><div class="small muted">Aligned to confirmed halving dates; only this backtest's observed periods appear.</div></div></div><div class="cycle-controls" id="cycle-controls" role="group" aria-label="Halving-cycle window size"></div><div class="heatmap-scroll"><table class="cycle-map" id="cycle-map" aria-label="Cycle-aligned Bitcoin returns and grid cash flow"></table></div><div class="cycle-detail" id="cycle-detail" aria-live="polite"></div><p class="small muted">Cells show BTC return in the observed slice. Select one to compare matched grid cash flow, full account return, inventory effect and completed pairs. A dot means the backtest covers only part of that calendar window. Each slice starts at its first observed price and ends at its last; periods without a confirmed cycle start are omitted.</p></article>
           <div class="two-col"><article class="chart-card"><div class="chart-header"><div class="chart-title">Daily return distribution <span>OBSERVED DAILY CLOSES</span></div></div><div class="chart-wrap medium"><canvas id="distribution-chart" role="img" aria-label="Histogram of daily portfolio returns"></canvas></div></article><article class="chart-card"><div class="chart-header"><div class="chart-title">Return &amp; annualization <span>PERCENT</span></div></div><div class="chart-wrap medium"><canvas id="rates-chart" role="img" aria-label="Comparison of observed ROI, simple APR, CAGR and hypothetical APY"></canvas></div><div class="chart-foot" id="annualization-note">—</div></article></div>
         </section>
         <section class="panel" id="panel-risk" aria-label="Risk and drawdown">
@@ -436,7 +440,7 @@ var GridEngine = (() => {
   let activeView='backtest';
   const $=id=>document.getElementById(id),ROOT='https://raw.githubusercontent.com/0xtrvkc/dynamic-btc-analytics-dashboard/main/';
   const FILES={'1d':'btc_daily_price.json','4h':'btc_4h_price.json','1h':'btc_1h_price.json','1m':null},cache=new Map();
-  let dataset=null,loadedGranularity=null,mvrvData=null,mvrvError=null,adaptiveRecommendation=null,result=null,charts=[],worker=null,workerURL=null,fetchController=null,loadId=0,busy=false,loadBusy=false,dirty=false,page=0,loadTime=null,gridLinkDriver='target';
+  let dataset=null,loadedGranularity=null,mvrvData=null,mvrvError=null,adaptiveRecommendation=null,result=null,charts=[],worker=null,workerURL=null,fetchController=null,loadId=0,busy=false,loadBusy=false,dirty=false,page=0,loadTime=null,gridLinkDriver='target',cycleWindowMonths=6;
   const usd=new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:2}),int=new Intl.NumberFormat('en-US');
   const money=v=>v==null||!Number.isFinite(v)?'N/A':usd.format(v),pct=(v,signed=true)=>v==null||!Number.isFinite(v)?'N/A':(v>0&&signed?'+':'')+(Math.abs(v)>1e7?v.toExponential(2):v.toFixed(2))+'%',num=v=>int.format(v),iso=t=>new Date(t).toISOString(),stamp=t=>iso(t).slice(0,16).replace('T',' ');
   const btcFmt=v=>v.toLocaleString('en-US',{minimumFractionDigits:8,maximumFractionDigits:8}),set=(id,v)=>$(id).textContent=v;
@@ -653,7 +657,7 @@ var GridEngine = (() => {
     const notes=[];if(!r.activation)notes.push(r.config.trigger!=null&&!r.triggered?'Entry trigger was never crossed. Capital stayed in cash.':'No in-range close was available for activation. Capital stayed in cash.');
     if(r.exit&&r.exit.reason!=='end-of-test')notes.push(r.exit.reason+' at '+money(r.exit.price)+' on '+stamp(r.exit.t)+' UTC; '+(r.exit.liquidated?'BTC sold, then held cash.':'BTC retained and marked through the selected end.'));
     if(r.skipped)notes.push(r.skipped+' unfunded crossings skipped.');if(r.missing)notes.push(r.missing+' nominal intervals missing; close crossings span those gaps.');if(r.dataInfo.invalid)notes.push(r.dataInfo.invalid+' invalid price records excluded.');if(s.days<30)notes.push('Under 30 elapsed days: annualized rates and risk estimates are sensitive to the short sample.');
-    $('run-notes').hidden=!notes.length;set('run-notes',notes.join(' '));renderQuant();renderCalendar();renderEpisodes();renderLadder();renderCharts();
+    $('run-notes').hidden=!notes.length;set('run-notes',notes.join(' '));renderQuant();renderCalendar();renderCycleMap();renderEpisodes();renderLadder();renderCharts();
   }
 
   function renderCashFlow(){
@@ -769,6 +773,7 @@ var GridEngine = (() => {
     if(!result)return;const r=result,c=r.config,s=r.stats,B=c.initialBalance,d=s.botDays,daily=d>0?s.gridProfit/d:null,gridApy=s.gridApr!=null&&1+s.gridApr/100/365>0?Math.expm1(365*Math.log1p(s.gridApr/100/365))*100:null;
     const output={sandbox_version:'2.0',ran_at:r.ranAt,config:{exchange:{name:'historical_close_simulation',trading_fee:c.feeRate,trading_mode:'backtest'},pair:{base_currency:'BTC',quote_currency:'USD'},trading_settings:{timeframe:c.granularity,period:{start_date:iso(r.rows[0].t),end_date:iso(r.rows.at(-1).t)},initial_balance:c.initialBalance},grid_strategy:{type:'simple_grid',model:c.model,spacing:c.spacing,num_grids:c.numGrids,count_convention:c.model==='binance'?'intervals':'price_levels',level_count:r.levels.length,range:{top:c.top,bottom:c.bottom},cash_buffer:c.reserveRate,trigger_price:c.trigger},risk_management:{take_profit:{enabled:c.tp!=null,threshold:c.tp},stop_loss:{enabled:c.sl!=null,threshold:c.sl},sell_all_btc_on_stop:c.sellOnStop,end_of_test:c.endAction},analytics:{risk_free_rate:c.riskFreeRate,apy_compounding_periods:365}},requested_period:r.requestedPeriod,data:r.dataInfo,
       assumptions:{execution_mode:c.executionMode,execution:c.executionMode==='ohlc'?'Deterministic intrabar OHLC path; true tick order remains unknown.':'Close crossings at grid levels.',entry_price_override:c.entryPriceOverride,exit_price_override:c.exitPriceOverride,fill_multiplier_reporting_only:c.fillMultiplier,fixed_order_quantity:c.fixedQty,fees:'USD per fill; exchange fee-token conversion, spread, queue priority and lot-size rounding not simulated.',order_quantity:r.qty,grid_profit:'Adjacent grid buy/sell pairs less both fees; seed sales and stop liquidations excluded.',floating_other:'Total P&L minus matched grid profit; includes unmatched and inventory effects.',realized:'Weighted average cost including entry fees; separate accounting lens.',total_apr:'Full-window simple annualization',bot_apr:'Account P&L at stop / capital / elapsed bot lifetime',cagr:'Observed start/end equity annualized',apy:'Hypothetical daily compounding of total APR; not simulated',daily_stats:'Last observed equity per UTC day; adjacent days only',legacy_ratios:'Original per-bar analyzer convention at 3% risk-free'},cash_flow:{net_grid_profit:s.gridProfit,grid_roi_percent:s.gridProfit/B*100,daily_run_rate:daily,normalized_30d_run_rate:daily==null?null:daily*30.4375,grid_apr_percent:s.gridApr,grid_apy_scenario_percent:gridApy,matched_pairs:s.matchedPairs,pairs_per_bot_day:d>0?s.matchedPairs/d:null,average_net_per_pair:s.averageCycle,gross_matched_spread:s.gridGross,matched_pair_fees:s.gridFees,gross_profit_retained_percent:s.gridGross>1e-12?s.gridProfit/s.gridGross*100:null,fee_share_of_gross_percent:s.gridGross>1e-12?s.gridFees/s.gridGross*100:null,capital_payback_days:daily>0?B/daily:null},exchange_comparison:{grid_profit:c.actualGridProfit,matched_cycles:c.actualCycles},stats:r.stats,quant_summary:r.quantSummary,activation:r.activation,exit:r.exit,missing_intervals:r.missing,unfunded_crossings:r.skipped,open_orders:r.openOrders,reserved_fiat:r.reservedFiat,reserved_btc:r.reservedBTC,levels:r.levels,initial_orders:r.initialOrders,monthly:r.analytics.monthly,drawdown_episodes:r.analytics.episodes};
+    output.cycle_heatmap={window_months:cycleWindowMonths,confirmed_halving_origins_utc:CYCLE_ORIGINS.map(t=>iso(t).slice(0,10)),definitions:'BTC and account return measured between first and last observed bars inside each selected calendar window; matched grid cash flow and fees are cumulative differences over those same bars. Partial indicates a run or data boundary; no independent simulation is performed per cell.',windows:cycleWindows(r,cycleWindowMonths)};
     download('btc-grid-run.json',JSON.stringify(output,null,2),'application/json');
   }
 
@@ -822,6 +827,52 @@ var GridEngine = (() => {
         button.addEventListener('click',()=>{for(const b of table.querySelectorAll('button'))b.classList.remove('selected');button.classList.add('selected');set('month-detail',button.title+' | Portfolio '+pct(m.ret)+' | BTC '+pct(m.hold));});td.append(button);
       }tr.append(td);}body.append(tr);
     }table.append(body);set('month-detail',all.length+' observed months · partial months are marked with a dot · no synthetic gap months.');
+  }
+
+  // Same confirmed UTC halving origins and clamped calendar-month windows as the source heatmap.
+  const CYCLE_ORIGINS=['2012-11-28','2016-07-09','2020-05-11','2024-04-20'].map(s=>Date.parse(s+'T00:00:00Z'));
+  function cycleMonth(origin,months){const d=new Date(origin),day=d.getUTCDate(),target=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+months,1));target.setUTCDate(Math.min(day,new Date(Date.UTC(target.getUTCFullYear(),target.getUTCMonth()+1,0)).getUTCDate()));return +target;}
+  function cycleWindows(r,months){
+    const rows=r.rows,firstT=rows[0].t,lastT=rows.at(-1).t,out=[];
+    const lowerBound=t=>{let lo=0,hi=rows.length;while(lo<hi){const mid=(lo+hi)>>1;if(rows[mid].t<t)lo=mid+1;else hi=mid;}return lo;};
+    for(let c=0;c<CYCLE_ORIGINS.length;c++){
+      const origin=CYCLE_ORIGINS[c],next=CYCLE_ORIGINS[c+1]??Infinity;
+      if(lastT<origin||firstT>=next)continue;
+      for(let i=0;i<240;i++){
+        const start=cycleMonth(origin,i*months),end=cycleMonth(origin,(i+1)*months);
+        if(start>lastT||start>=next)break;
+        if(end>next)break; // Never assign a window across a confirmed halving.
+        if(end<=firstT)continue;
+        const left=lowerBound(Math.max(start,firstT)),right=lowerBound(end)-1;
+        if(right<=left)continue;
+        const a=rows[left],b=rows[right],matches=r.matches.filter(m=>m.sellTime>a.t&&m.sellTime<=b.t);
+        const step=GridEngine.INTERVALS[r.config.granularity];
+        out.push({cycle:c+1,month:i*months,start,end,from:a.t,to:b.t,partial:a.t>start+step||b.t<end-step,
+          btc:(b.p/a.p-1)*100,portfolio:(b.equity/a.equity-1)*100,grid:b.gridProfit-a.gridProfit,
+          account:b.equity-a.equity,other:(b.equity-a.equity)-(b.gridProfit-a.gridProfit),
+          pairs:matches.length,fees:b.fees-a.fees,inRange:rows.slice(left,right+1).filter(x=>x.inRange).length/(right-left+1)*100});
+      }
+    }
+    return out;
+  }
+  function renderCycleMap(){
+    const months=cycleWindowMonths,windows=cycleWindows(result,months),table=$('cycle-map'),controls=$('cycle-controls'),detail=$('cycle-detail');
+    controls.replaceChildren();table.replaceChildren();
+    for(const size of [1,2,3,4,6,12]){const button=document.createElement('button');button.type='button';button.textContent=size===1?'Monthly':size+' months';button.setAttribute('aria-pressed',size===months);button.addEventListener('click',()=>{cycleWindowMonths=size;renderCycleMap();});controls.append(button);}
+    if(!windows.length){detail.textContent='No cycle windows have at least two observed prices in this run.';return;}
+    const slots=[...new Set(windows.map(w=>w.month))].sort((a,b)=>a-b),head=document.createElement('tr');
+    for(const label of ['Cycle',...slots.map(n=>'M'+n+'–'+(n+months))]){const th=document.createElement('th');th.scope='col';th.textContent=label;head.append(th);}const thead=document.createElement('thead');thead.append(head);table.append(thead);
+    const body=document.createElement('tbody'),C=palette();let selected=null,latestButton=null;
+    const inspect=(w,button)=>{if(selected)selected.classList.remove('selected');selected=button;button.classList.add('selected');
+      const hidden=w.grid>0&&w.account<0?' Matched cash flow was positive while the full account lost value.':'';
+      detail.innerHTML='<strong>C'+w.cycle+' · M'+w.month+'–'+(w.month+months)+(w.partial?' · partial':'')+'</strong> · '+stamp(w.from)+' → '+stamp(w.to)+' UTC<br>BTC '+pct(w.btc)+' · portfolio '+pct(w.portfolio)+' ('+money(w.account)+') · matched grid cash flow '+money(w.grid)+' · floating/other change '+money(w.other)+' · '+w.pairs+' completed pairs · fees charged '+money(w.fees)+' · observed in-range bars '+pct(w.inRange,false)+'.'+hidden;
+    };
+    for(const cycle of [...new Set(windows.map(w=>w.cycle))]){const tr=document.createElement('tr'),th=document.createElement('th');th.scope='row';th.textContent='C'+cycle+' · '+iso(CYCLE_ORIGINS[cycle-1]).slice(0,10);tr.append(th);
+      for(const slot of slots){const td=document.createElement('td'),w=windows.find(x=>x.cycle===cycle&&x.month===slot);if(w){const button=document.createElement('button');button.type='button';button.style.backgroundColor=(w.btc>=0?C.green:C.red)+Math.round((.09+Math.min(Math.abs(w.btc)/45,1)*.35)*255).toString(16).padStart(2,'0');button.innerHTML=(w.btc>0?'+':'')+w.btc.toFixed(1)+'%'+(w.partial?' ·':'')+'<small>Grid '+money(w.grid)+'</small>';button.title='C'+cycle+' M'+slot+'–'+(slot+months)+' · BTC '+pct(w.btc)+' · grid '+money(w.grid)+(w.partial?' · partial run window':'');button.setAttribute('aria-label',button.title);button.addEventListener('click',()=>inspect(w,button));td.append(button);if(w===windows.at(-1))latestButton=button;}else{td.className='no-window';td.textContent='—';}tr.append(td);}body.append(tr);
+    }table.append(body);
+    const divergent=windows.filter(w=>w.grid>0&&w.account<0).length;
+    detail.textContent=windows.length+' observed windows · '+divergent+' with positive matched cash flow and negative account P&L.';
+    if(latestButton)latestButton.click();
   }
 
   function renderEpisodes(){

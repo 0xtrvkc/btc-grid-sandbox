@@ -145,6 +145,12 @@
         <section class="panel" id="panel-quant" aria-label="Quant summary">
           <div class="toolbar"><div class="panel-heading"><div class="eyebrow">04 / QUANT SUMMARY</div><h2>The story behind the return.</h2><p>Computed from this run. Descriptive analysis, not a forecast.</p></div><button id="export-summary">↓ Summary TXT</button></div>
           <div id="quant-summary" class="quant-report"></div>
+          <article class="chart-card" aria-labelledby="bootstrap-title">
+            <div class="chart-header"><div class="chart-title" id="bootstrap-title">Return robustness <span>7-DAY BLOCK BOOTSTRAP</span></div></div>
+            <p class="small muted" id="bootstrap-note" aria-live="polite">Run a backtest to evaluate the daily sample.</p>
+            <div class="scorecard" id="bootstrap-scorecard"></div>
+            <p class="small muted">Resamples total account daily returns, including fees and inventory effects. Ranges describe this historical sample; they are not forecasts, fresh grid simulations or out-of-sample validation. Daily-close drawdowns can miss intraday losses.</p>
+          </article>
           <div class="two-col"><article class="chart-card"><div class="chart-header"><div class="chart-title">30-day rolling returns <span>GRID VS. HOLD</span></div></div><div class="chart-wrap medium"><canvas id="rolling-chart" role="img" aria-label="Rolling 30 calendar day portfolio and BTC returns"></canvas></div></article><article class="chart-card"><div class="chart-header"><div class="chart-title">BTC sensitivity <span>DAILY RETURNS</span></div></div><div class="chart-wrap medium"><canvas id="beta-chart" role="img" aria-label="Daily strategy returns against daily Bitcoin returns and fitted regression"></canvas></div><div class="chart-foot" id="beta-note">—</div></article></div>
           <article class="chart-card"><div class="chart-header"><div class="chart-title">Quant scorecard <span>DEFINITIONS IN METHODOLOGY</span></div></div><div class="scorecard" id="quant-scorecard"></div></article>
         </section>
@@ -156,7 +162,7 @@
           <div class="pagination"><span id="page-info">Page 0 of 0</span><div><button id="prev-page" disabled>← Previous</button> <button id="next-page" disabled>Next →</button></div></div>
           <details class="info ladder-details"><summary>Grid ladder · prices, initial orders and paired income</summary><div class="tbl-wrap"><table><thead><tr><th>Level</th><th>Price · USD</th><th>At initialization</th><th>Final order</th><th>Matched sells</th><th>Net matched profit</th></tr></thead><tbody id="ladder-body"></tbody></table></div></details>
         </section>
-        <div id="model-note" class="model-note"><strong>Close-only execution.</strong> Fills are inferred from grid lines crossed between observed closes. Intrabar reversals, liquidity, spread and slippage are unknown. Bootstrap and stop orders execute at observed closes.</div>
+        <div id="model-note" class="model-note"><strong>Close-only execution.</strong> Fills are inferred from grid lines crossed between observed closes. Intrabar reversals, liquidity, spread and slippage are unknown. Seed purchases and stop orders execute at observed closes unless an execution override applies.</div>
       </div>
       <div id="empty" class="info empty"><h2>Loading your first experiment.</h2><p>The default simulation starts when BTC prices arrive.<br>Open Strategy configuration to change its assumptions.</p></div>
       <section class="panel" id="panel-method" aria-label="Methodology">
@@ -189,6 +195,7 @@
           <tr><td>Beta / alpha</td><td>Daily portfolio versus BTC returns. Beta = covariance / BTC variance; alpha = annualized daily excess intercept. Correlation is Pearson’s r. Tracking error is the annualized SD of daily return differences. Information ratio is their annualized mean/SD. Regression metrics need ≥20 aligned daily returns.</td></tr>
           <tr><td>Profit factor / win rate</td><td>Daily profit factor uses net equity gains divided by losses, including inventory effects. Daily win rate excludes flat days. Matched-cycle stats include completed adjacent pairs only; a 100% cycle win rate can coexist with a losing portfolio. ∞ means gains without observed losses; no observations show N/A.</td></tr>
           </tbody></table></div></article>
+          <article class="info wide"><h3>Bootstrap robustness</h3><p>Inspired by <a href="https://www.pybroker.com/en/latest/notebooks/3.%20Evaluating%20with%20Bootstrap%20Metrics.html" target="_blank" rel="noopener noreferrer">PyBroker’s bootstrap evaluation</a>. This browser implementation uses 1,000 deterministic moving-block resamples of total account daily returns with a fixed seed of 20261004. Each path has the observed return count; seven-day blocks are drawn with replacement, the last block is truncated, and blocks never cross missing calendar days. Isolated returns that cannot join a complete block are disclosed. At least 30 daily returns and one complete block are required.</p><p>Sharpe uses sample standard deviation and the configured daily risk-free rate, annualized by √365. Its central 95% percentile range is N/A if fewer than 90% of paths have a defined Sharpe. Compounded return uses the sampled daily returns over the sample horizon, which excludes missing-day changes and the initial entry interval; it need not equal full-run ROI. Daily-close drawdown starts at normalized equity 1 and includes its initial peak. The p95 and p99 drawdowns are positive loss magnitudes. These estimates include the selected strategy’s in-sample bias, may include partial first/last daily intervals, and cannot bound future losses.</p><p>PyBroker uses per-bar BCa confidence intervals; this implementation uses seven-day moving blocks and percentile ranges. It does not run Python or PyBroker, retrain or optimize the grid, recompute orders on synthetic prices, or measure intraday drawdown. The observed backtest and balances remain unchanged.</p></article>
           <article class="info wide"><h3>Original model &amp; reproducibility</h3><p>The original mode preserves the v1 <a href="https://github.com/jordantete/grid_trading_bot/blob/master/docs/concepts/grid-trading.md" target="_blank" rel="noopener noreferrer">grid_trading_bot-inspired model</a>: N price levels, a 50% BTC seed, midpoint filters and Q = initial balance / N / entry price. Its default end policy marks open holdings. A midpoint remains a chart reference in both modes; optional activation triggers are separate.</p><p>Prices are fetched directly from the <a href="https://github.com/0xtrvkc/dynamic-btc-analytics-dashboard" target="_blank" rel="noopener noreferrer">BTC analytics dataset</a>. Picker limits come from the loaded file. Naive timestamps are UTC, invalid records are counted, and gaps are reported. Default ranges use only the first selected close. Every bar affects accounting; only plotted lines may be reduced while preserving bucket extrema. JSON exports retain inputs, selected-data hash, definitions, results and the quant summary.</p><p>Close-only data cannot reconstruct ticks, candle extremes or liquidity. Binance rules are adapted for this research sandbox; this is not an exact replica of live exchange execution. The quant summary is generated deterministically from measured results, with no remote AI or trading connection.</p></article>
         </div>
       </section>
@@ -284,6 +291,47 @@ var GridEngine = (() => {
     return {apr:Number.isFinite(apr)?apr*100:null,cagr:Number.isFinite(cagr)?cagr*100:null,apy:Number.isFinite(apy)?apy*100:null};
   }
   function quantile(values,q){if(!values.length)return null;const a=[...values].sort((a,b)=>a-b),k=(a.length-1)*q,i=Math.floor(k);return a[i]+(a[Math.min(i+1,a.length-1)]-a[i])*(k-i);}
+  // Moving blocks preserve short runs of daily dependence; no block crosses a data gap.
+  // These percentile estimates intentionally differ from PyBroker's per-bar BCa method.
+  function bootstrap(daily,riskFreeRate=.03){
+    const samples=1000,seed=20261004,blockDays=7,n=daily.length;
+    const meta={method:'moving-block percentile',samples,seed,blockDays,observations:n,confidence:.95,annualization:365};
+    const unavailable=reason=>({...meta,available:false,reason});
+    if(n<30)return unavailable('At least 30 adjacent daily returns are required.');
+    if(daily.some((x,i)=>!Number.isFinite(x.ret)||x.ret<=-1||!Number.isInteger(x.day)||(i&&x.day<=daily[i-1].day)))return unavailable('Daily returns must be finite, above −100%, and chronological.');
+    if(!Number.isFinite(riskFreeRate)||riskFreeRate<0||riskFreeRate>.25)return unavailable('Invalid annual risk-free rate.');
+    const starts=[];
+    for(let i=0;i<=n-blockDays;i++){
+      let contiguous=true;for(let j=1;j<blockDays;j++)if(daily[i+j].day!==daily[i].day+j){contiguous=false;break;}
+      if(contiguous)starts.push(i);
+    }
+    if(!starts.length)return unavailable('No uninterrupted seven-day return block is available.');
+    let state=seed>>>0;
+    const random=()=>{state=(Math.imul(state,1664525)+1013904223)>>>0;return state/4294967296;};
+    const sharpes=[],returns=[],drawdowns=[];
+    for(let b=0;b<samples;b++){
+      let count=0,m=0,m2=0,logEquity=0,logPeak=0,maxDD=0;
+      while(count<n){
+        const start=starts[Math.floor(random()*starts.length)];
+        for(let j=0;j<blockDays&&count<n;j++){
+          const ret=daily[start+j].ret;count++;
+          const delta=ret-m;m+=delta/count;m2+=delta*(ret-m);
+          logEquity+=Math.log1p(ret);logPeak=Math.max(logPeak,logEquity);
+          maxDD=Math.max(maxDD,-Math.expm1(logEquity-logPeak)*100);
+        }
+      }
+      const deviation=Math.sqrt(Math.max(0,m2)/(n-1));
+      if(deviation>1e-12)sharpes.push((m-riskFreeRate/365)/deviation*Math.sqrt(365));
+      const total=Math.expm1(logEquity)*100;
+      if(!Number.isFinite(total))return unavailable('Resampled return overflow; narrow the evaluation window.');
+      returns.push(total);drawdowns.push(maxDD);
+    }
+    const interval=a=>({lower:quantile(a,.025),median:quantile(a,.5),upper:quantile(a,.975)});
+    return {...meta,available:true,eligibleBlocks:starts.length,excludedDays:n-new Set(starts.flatMap(i=>Array.from({length:blockDays},(_,j)=>i+j))).size,
+      sharpe:sharpes.length>=samples*.9?interval(sharpes):null,validSharpeSamples:sharpes.length,
+      returnPercent:interval(returns),drawdownPercent:{median:quantile(drawdowns,.5),p95:quantile(drawdowns,.95),p99:quantile(drawdowns,.99)},
+      positivePathsPercent:returns.filter(x=>x>0).length/samples*100};
+  }
   function analyze(r){
     const rows=r.rows,B=r.config.initialBalance,last=rows.at(-1),s=r.stats,rf=r.config.riskFreeRate??.03,elapsed=last.t-rows[0].t,days=elapsed/DAY;
     let peak=B,peakT=rows[0].t,episode=null,area=0,under=0,expoArea=0,rangeTime=0,runningTime=0,maxCashDD=0,holdPeak=B;
@@ -347,7 +395,7 @@ var GridEngine = (() => {
       if(day-oldDay!==30)continue;
       rolling.push({t:row.t,grid:(row.equity/old.equity-1)*100,hold:(row.p/old.p-1)*100});
     }
-    r.analytics={episodes:episodes.sort((a,b)=>b.depth-a.depth),daily,monthly,rolling};
+    r.analytics={episodes:episodes.sort((a,b)=>b.depth-a.depth),daily,monthly,rolling,bootstrap:bootstrap(daily,rf)};
     return r;
   }
   function simulate(bars,input,progress=()=>{}){
@@ -431,7 +479,7 @@ var GridEngine = (() => {
       stats:{roi:pnl/B*100,buyHold:(last.p/bars[0].p-1)*100,maxDD,maxRunup,totalFees,buys,sells,fiat,btc,equity:last.equity,pnl,realized,unrealized,gridProfit,floating:pnl-gridProfit,...ratios(rows.map(r=>r.equity),interval)}};
     return analyze(r);
   }
-  return Object.freeze({parseData,generateLevels,geometry,setup,validateConfig,annualized,analyze,ratios,simulate,INTERVALS,DAY});
+  return Object.freeze({parseData,generateLevels,geometry,setup,validateConfig,annualized,analyze,bootstrap,ratios,simulate,INTERVALS,DAY});
 })();
 </script>
 <script>
@@ -652,7 +700,7 @@ var GridEngine = (() => {
     set('price-foot',r.levels.length+' prices · midpoint '+money(r.center)+' · '+(r.activation?btcFmt(r.qty)+' BTC/order':'no in-range activation'));
     set('trades-count',s.buys+' buys / '+s.sells+' sells');set('equity-foot','Total P&L '+money(s.pnl)+' = fiat '+money(s.fiat)+' + BTC '+money(s.btc*r.rows.at(-1).p)+' − initial '+money(r.config.initialBalance));
     set('cycle-summary',s.matchedPairs+' pairs · average '+money(s.averageCycle)+' · '+pct(s.cycleWinRate,false)+' winners. Closed pairs exclude open BTC losses.');
-    renderFidelityAudit();
+    renderFidelityAudit();renderBootstrap();
     set('annualization-note',daysText(s.days)+' evaluation · '+daysText(s.botDays)+' bot lifetime · APY is hypothetical.');set('exposure-note','Time-weighted average exposure '+pct(s.averageExposure,false)+' · in-range share of running time '+pct(s.inRangePct,false)+'.');
     const notes=[];if(!r.activation)notes.push(r.config.trigger!=null&&!r.triggered?'Entry trigger was never crossed. Capital stayed in cash.':'No in-range close was available for activation. Capital stayed in cash.');
     if(r.exit&&r.exit.reason!=='end-of-test')notes.push(r.exit.reason+' at '+money(r.exit.price)+' on '+stamp(r.exit.t)+' UTC; '+(r.exit.liquidated?'BTC sold, then held cash.':'BTC retained and marked through the selected end.'));
@@ -771,8 +819,8 @@ var GridEngine = (() => {
   function download(name,text,type){const url=URL.createObjectURL(new Blob([text],{type})),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);}
   function exportConfig(){
     if(!result)return;const r=result,c=r.config,s=r.stats,B=c.initialBalance,d=s.botDays,daily=d>0?s.gridProfit/d:null,gridApy=s.gridApr!=null&&1+s.gridApr/100/365>0?Math.expm1(365*Math.log1p(s.gridApr/100/365))*100:null;
-    const output={sandbox_version:'2.0',ran_at:r.ranAt,config:{exchange:{name:'historical_close_simulation',trading_fee:c.feeRate,trading_mode:'backtest'},pair:{base_currency:'BTC',quote_currency:'USD'},trading_settings:{timeframe:c.granularity,period:{start_date:iso(r.rows[0].t),end_date:iso(r.rows.at(-1).t)},initial_balance:c.initialBalance},grid_strategy:{type:'simple_grid',model:c.model,spacing:c.spacing,num_grids:c.numGrids,count_convention:c.model==='binance'?'intervals':'price_levels',level_count:r.levels.length,range:{top:c.top,bottom:c.bottom},cash_buffer:c.reserveRate,trigger_price:c.trigger},risk_management:{take_profit:{enabled:c.tp!=null,threshold:c.tp},stop_loss:{enabled:c.sl!=null,threshold:c.sl},sell_all_btc_on_stop:c.sellOnStop,end_of_test:c.endAction},analytics:{risk_free_rate:c.riskFreeRate,apy_compounding_periods:365}},requested_period:r.requestedPeriod,data:r.dataInfo,
-      assumptions:{execution_mode:c.executionMode,execution:c.executionMode==='ohlc'?'Deterministic intrabar OHLC path; true tick order remains unknown.':'Close crossings at grid levels.',entry_price_override:c.entryPriceOverride,exit_price_override:c.exitPriceOverride,fill_multiplier_reporting_only:c.fillMultiplier,fixed_order_quantity:c.fixedQty,fees:'USD per fill; exchange fee-token conversion, spread, queue priority and lot-size rounding not simulated.',order_quantity:r.qty,grid_profit:'Adjacent grid buy/sell pairs less both fees; seed sales and stop liquidations excluded.',floating_other:'Total P&L minus matched grid profit; includes unmatched and inventory effects.',realized:'Weighted average cost including entry fees; separate accounting lens.',total_apr:'Full-window simple annualization',bot_apr:'Account P&L at stop / capital / elapsed bot lifetime',cagr:'Observed start/end equity annualized',apy:'Hypothetical daily compounding of total APR; not simulated',daily_stats:'Last observed equity per UTC day; adjacent days only',legacy_ratios:'Original per-bar analyzer convention at 3% risk-free'},cash_flow:{net_grid_profit:s.gridProfit,grid_roi_percent:s.gridProfit/B*100,daily_run_rate:daily,normalized_30d_run_rate:daily==null?null:daily*30.4375,grid_apr_percent:s.gridApr,grid_apy_scenario_percent:gridApy,matched_pairs:s.matchedPairs,pairs_per_bot_day:d>0?s.matchedPairs/d:null,average_net_per_pair:s.averageCycle,gross_matched_spread:s.gridGross,matched_pair_fees:s.gridFees,gross_profit_retained_percent:s.gridGross>1e-12?s.gridProfit/s.gridGross*100:null,fee_share_of_gross_percent:s.gridGross>1e-12?s.gridFees/s.gridGross*100:null,capital_payback_days:daily>0?B/daily:null},exchange_comparison:{grid_profit:c.actualGridProfit,matched_cycles:c.actualCycles},stats:r.stats,quant_summary:r.quantSummary,activation:r.activation,exit:r.exit,missing_intervals:r.missing,unfunded_crossings:r.skipped,open_orders:r.openOrders,reserved_fiat:r.reservedFiat,reserved_btc:r.reservedBTC,levels:r.levels,initial_orders:r.initialOrders,monthly:r.analytics.monthly,drawdown_episodes:r.analytics.episodes};
+    const output={sandbox_version:'2.1',ran_at:r.ranAt,config:{exchange:{name:'historical_close_simulation',trading_fee:c.feeRate,trading_mode:'backtest'},pair:{base_currency:'BTC',quote_currency:'USD'},trading_settings:{timeframe:c.granularity,period:{start_date:iso(r.rows[0].t),end_date:iso(r.rows.at(-1).t)},initial_balance:c.initialBalance},grid_strategy:{type:'simple_grid',model:c.model,spacing:c.spacing,num_grids:c.numGrids,count_convention:c.model==='binance'?'intervals':'price_levels',level_count:r.levels.length,range:{top:c.top,bottom:c.bottom},cash_buffer:c.reserveRate,trigger_price:c.trigger},risk_management:{take_profit:{enabled:c.tp!=null,threshold:c.tp},stop_loss:{enabled:c.sl!=null,threshold:c.sl},sell_all_btc_on_stop:c.sellOnStop,end_of_test:c.endAction},analytics:{risk_free_rate:c.riskFreeRate,apy_compounding_periods:365}},requested_period:r.requestedPeriod,data:r.dataInfo,
+      assumptions:{execution_mode:c.executionMode,execution:c.executionMode==='ohlc'?'Deterministic intrabar OHLC path; true tick order remains unknown.':'Close crossings at grid levels.',entry_price_override:c.entryPriceOverride,exit_price_override:c.exitPriceOverride,fill_multiplier_reporting_only:c.fillMultiplier,fixed_order_quantity:c.fixedQty,fees:'USD per fill; exchange fee-token conversion, spread, queue priority and lot-size rounding not simulated.',order_quantity:r.qty,grid_profit:'Adjacent grid buy/sell pairs less both fees; seed sales and stop liquidations excluded.',floating_other:'Total P&L minus matched grid profit; includes unmatched and inventory effects.',realized:'Weighted average cost including entry fees; separate accounting lens.',total_apr:'Full-window simple annualization',bot_apr:'Account P&L at stop / capital / elapsed bot lifetime',cagr:'Observed start/end equity annualized',apy:'Hypothetical daily compounding of total APR; not simulated',daily_stats:'Last observed equity per UTC day; adjacent days only',legacy_ratios:'Original per-bar analyzer convention at 3% risk-free'},cash_flow:{net_grid_profit:s.gridProfit,grid_roi_percent:s.gridProfit/B*100,daily_run_rate:daily,normalized_30d_run_rate:daily==null?null:daily*30.4375,grid_apr_percent:s.gridApr,grid_apy_scenario_percent:gridApy,matched_pairs:s.matchedPairs,pairs_per_bot_day:d>0?s.matchedPairs/d:null,average_net_per_pair:s.averageCycle,gross_matched_spread:s.gridGross,matched_pair_fees:s.gridFees,gross_profit_retained_percent:s.gridGross>1e-12?s.gridProfit/s.gridGross*100:null,fee_share_of_gross_percent:s.gridGross>1e-12?s.gridFees/s.gridGross*100:null,capital_payback_days:daily>0?B/daily:null},exchange_comparison:{grid_profit:c.actualGridProfit,matched_cycles:c.actualCycles},bootstrap:r.analytics.bootstrap,stats:r.stats,quant_summary:r.quantSummary,activation:r.activation,exit:r.exit,missing_intervals:r.missing,unfunded_crossings:r.skipped,open_orders:r.openOrders,reserved_fiat:r.reservedFiat,reserved_btc:r.reservedBTC,levels:r.levels,initial_orders:r.initialOrders,monthly:r.analytics.monthly,drawdown_episodes:r.analytics.episodes};
     output.cycle_heatmap={window_months:cycleWindowMonths,confirmed_halving_origins_utc:CYCLE_ORIGINS.map(t=>iso(t).slice(0,10)),definitions:'BTC and account return measured between first and last observed bars inside each selected calendar window; matched grid cash flow and fees are cumulative differences over those same bars. Partial indicates a run or data boundary; no independent simulation is performed per cell.',windows:cycleWindows(r,cycleWindowMonths)};
     download('btc-grid-run.json',JSON.stringify(output,null,2),'application/json');
   }
@@ -805,9 +853,29 @@ var GridEngine = (() => {
       {label:'05 / EXECUTION & EXPOSURE',title:'How the range used the capital',text:'BTC exposure averaged '+pct(s.averageExposure,false)+' of equity. While the bot was running, '+pct(s.inRangePct,false)+' of elapsed time was in range. There were '+s.buys+' buy fills and '+s.sells+' sell fills, including seed and stop orders. '+s.matchedPairs+' matched pairs had a '+pct(s.cycleWinRate,false)+' win rate; this excludes inventory losses. Fees consumed '+pct(s.feeDrag,false)+' of starting capital.'},
       {label:'06 / ANNUALIZATION',title:'Cash-flow yield is not account growth',text:'Matched grid APR is '+pct(s.gridApr)+' and its hypothetical daily-reinvestment APY is '+pct(cfApy)+'. Full-account APR is '+pct(s.apr)+', CAGR is '+pct(s.cagr)+', and bot APR is '+pct(s.botApr)+' across '+daysText(s.botDays)+'. Both APY figures are illustrations rather than returns produced by this fixed-order-size engine.'},
       {label:'07 / SAMPLE & SENSITIVITY',title:'What supports these estimates',text:s.dailyCount+' adjacent daily return observations support a daily Sharpe of '+formatRatio(s.dailySharpe)+' and Sortino of '+formatRatio(s.dailySortino)+'. BTC beta is '+formatRatio(s.beta)+' and correlation '+formatRatio(s.correlation)+'. '+(s.days<90?'The short evaluation window makes extrapolated annual rates especially sensitive. ':'These estimates describe one historical range and period. ')+(r.missing?r.missing+' nominal bars were missing. ':'No nominal bar gaps were detected. ')+(r.exit&&r.exit.reason!=='end-of-test'?'The bot stopped on '+stamp(r.exit.t)+' UTC; '+(r.exit.liquidated?'cash remained uninvested afterward.':'retained BTC continued to affect the full-window result.'):'')+' Close-only fills cannot establish intrabar execution quality.'}
-    ];return {title,brief,items,text:'BTC Grid Sandbox · Quant summary\n'+stamp(r.rows[0].t)+' → '+stamp(r.rows.at(-1).t)+' UTC\nModel: '+r.config.model+'; '+r.config.granularity+'\n\n'+items.map(x=>x.title+'\n'+x.text).join('\n\n')+'\n\nHistorical simulation. Not financial advice.'};
+    ];items.push({label:'08 / RETURN ROBUSTNESS',title:'Sensitivity to the historical return sequence',text:bootstrapText(r.analytics.bootstrap)});return {title,brief,items,text:'BTC Grid Sandbox · Quant summary\n'+stamp(r.rows[0].t)+' → '+stamp(r.rows.at(-1).t)+' UTC\nModel: '+r.config.model+'; '+r.config.granularity+'\n\n'+items.map(x=>x.title+'\n'+x.text).join('\n\n')+'\n\nHistorical simulation. Not financial advice.'};
   }
 
+  function bootstrapText(b){
+    if(!b.available)return 'Bootstrap unavailable: '+b.reason;
+    const band=(v,fmt)=>v?fmt(v.lower)+' to '+fmt(v.upper):'N/A';
+    return b.samples+' resamples of '+b.observations+' daily returns in '+b.blockDays+'-day blocks. 95% percentile Sharpe range '+band(b.sharpe,formatRatio)+
+      '; compounded sample-horizon return range '+band(b.returnPercent,pct)+'; resampled daily-close drawdown p95 '+pct(b.drawdownPercent.p95,false)+'. These are sample sensitivity estimates, not future probabilities or out-of-sample tests.';
+  }
+  function renderBootstrap(){
+    const b=result.analytics.bootstrap,score=$('bootstrap-scorecard');score.replaceChildren();
+    set('bootstrap-note',b.available?b.samples+' reproducible resamples · '+b.observations+' daily returns · seed '+b.seed+' · '+b.eligibleBlocks+' eligible blocks'+(b.excludedDays?' · '+b.excludedDays+' isolated returns excluded from blocks':'')+'. First/last daily intervals may be partial.':b.reason);
+    if(!b.available)return;
+    const band=(v,fmt)=>v?fmt(v.lower)+' → '+fmt(v.upper):'N/A';
+    for(const [label,value] of [
+      ['Annualized Sharpe · 95% percentile range',band(b.sharpe,formatRatio)],
+      ['Compounded return · 95% sample-horizon range',band(b.returnPercent,pct)],
+      ['Resampled daily-close max drawdown · median',pct(b.drawdownPercent.median,false)],
+      ['Resampled daily-close max drawdown · p95 / p99',pct(b.drawdownPercent.p95,false)+' / '+pct(b.drawdownPercent.p99,false)],
+      ['Positive resampled paths · descriptive share',pct(b.positivePathsPercent,false)],
+      ['Defined Sharpe samples',num(b.validSharpeSamples)+' / '+num(b.samples)]
+    ]){const row=document.createElement('div');row.className='scorecard-row';const name=document.createElement('span'),v=document.createElement('strong');name.textContent=label;v.textContent=value;row.append(name,v);score.append(row);}
+  }
   function renderQuant(){
     const r=result,s=r.stats,q=makeQuantSummary(r),cfDaily=s.botDays>0?s.gridProfit/s.botDays:null,cfApy=s.gridApr!=null&&1+s.gridApr/100/365>0?Math.expm1(365*Math.log1p(s.gridApr/100/365))*100:null;r.quantSummary=q;set('snapshot-title',q.title);set('snapshot-text',q.brief);
     const report=$('quant-summary');report.replaceChildren();for(const item of q.items){const card=document.createElement('article');card.className='quant-note';for(const [tag,cls,value] of [['div','section-label',item.label],['h3','',item.title],['p','',item.text]]){const el=document.createElement(tag);el.className=cls;el.textContent=value;card.append(el);}report.append(card);}

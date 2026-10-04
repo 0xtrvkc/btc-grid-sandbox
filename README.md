@@ -80,6 +80,20 @@ The cutoff is strict: price and MVRV observations must be timestamped at or befo
 
 Changing the date range does not automatically recenter an existing grid. Use **Center on first close ±20%** when that is the intended setup. Data coverage comes from the selected file and can differ between granularities.
 
+### Return robustness · PyBroker-inspired
+
+**Quant summary** now reports 1,000 reproducible seven-day moving-block resamples of the total account’s daily returns, including fees and inventory effects:
+
+- central 95% percentile ranges for annualized Sharpe and compounded sample-horizon return;
+- median, p95 and p99 resampled daily-close maximum drawdowns;
+- the descriptive share of positive resampled paths and count of defined Sharpe samples.
+
+Inspired by [PyBroker’s bootstrap evaluation](https://www.pybroker.com/en/latest/notebooks/3.%20Evaluating%20with%20Bootstrap%20Metrics.html), implemented in JavaScript to preserve browser-only operation. PyBroker uses per-bar BCa intervals; this implementation uses moving blocks and percentile ranges. It does not install or execute PyBroker.
+
+The fixed seed is `20261004`; each path contains the observed number of daily returns. Seven-day blocks never cross missing calendar days. Returns that cannot join a complete block are disclosed as excluded. Fewer than 30 daily returns or no complete seven-day block yields an explanatory unavailable state. Constant returns produce N/A Sharpe, while return and drawdown estimates remain available. Sharpe ranges require at least 90% defined samples and use the configured risk-free rate.
+
+These are historical sample sensitivity estimates, not future probabilities or out-of-sample validation. Returns are resampled rather than prices, so orders are not re-executed. First/last daily intervals may be partial; missing-day changes and the initial entry interval are excluded, so the compounded sample return need not equal full-run ROI. Daily-close drawdowns can miss intraday losses. Both Run JSON and Summary TXT include the analysis; simulation fills and balances are unchanged.
+
 ## Research views
 
 - **Overview:** cash-flow-first grid economics, followed by account/inventory reality; net ROI beside buy & hold, maximum drawdown, APR, CAGR, Sharpe, fees and balances; equity, price/fill and underwater charts.
@@ -175,3 +189,9 @@ The v2 engine was checked against hand-calculated sizing, spacing, matched-pair 
 The delivered HTML fetched all three remote files in a JavaScript DOM/native-canvas test harness. All 13 Chart.js charts rendered; form validation, date bounds, annotations, navigation, exports and reset passed. Chart images were visually inspected. Full browser layout verification was unavailable in the execution environment.
 
 Historical simulation. Not financial advice.
+
+### Automated checks
+
+Run `node --test tests/*.test.cjs` with Node.js 22 or newer; no packages are required. GitHub Actions runs the same checks on pull requests and pushes to `main`. The suite covers independent bootstrap formula comparisons, fixed-seed reproducibility, gaps and degenerate samples, accounting reconciliation across model/spacing/exit combinations, worker parity, robustness-panel state changes and JSON/summary export integration.
+
+For the bootstrap upgrade, 100 seeded full-output regression scenarios also matched the pre-upgrade engine after removing the new analytics field. A full browser visual check was unavailable because the browser binary could not be downloaded in the execution environment; the panel and export integration were exercised with a minimal DOM harness.
